@@ -1,16 +1,16 @@
 import mysql.connector
 
 class SQL:
-    def __init__(self):
-        self.connect = mysql.connector.connect(
+    sql = mysql.connector.connect(
             user="root",
             password="552299",
             host="localhost",
-            database="biblioteca"
-        )        
-    def query_view_emprestimos():
-        cursor = SQL.connect
-        cursor.execute(f"SELECT * FROM emprestimos")
+            database="biblioteca" 
+    )
+    def select_view(table):
+        cursor = SQL.sql.cursor()
+        cursor.execute(f"SELECT * FROM {table}")
         myresult = cursor.fetchall()
-        for x in myresult:
-            print(myresult)
+        for data in myresult:
+            print(data)
+
