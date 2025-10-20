@@ -1,13 +1,9 @@
---- INSERT 5 TEST VALUES IN AUTORES ---
-
 INSERT INTO tb_autores (autor) VALUES
 	('Miguel de Cervantes'),
 	('Antoine de Saint-Exupéry'),
 	('Charles Dickens'),
 	('J. R. R. Tolkien'),
 	('J. K. Rowling');
-
---- INSERT 5 TEST VALUES IN GENEROS ---
 
 INSERT INTO tb_generos (genero) VALUES
 	('Romance'),
@@ -16,8 +12,6 @@ INSERT INTO tb_generos (genero) VALUES
 	('Paródia'),
 	('Ficção');
 
---- INSERT 5 TEST VALUES IN LIVROS ---
-
 INSERT INTO tb_livros (id_autor, id_genero, quantidade, livro) VALUES
 	(1, 1, 4, 'Dom Quixote'),
 	(2, 2, 7, 'O Pequeno Príncipe'),
@@ -25,16 +19,12 @@ INSERT INTO tb_livros (id_autor, id_genero, quantidade, livro) VALUES
 	(4, 4, 9, 'O Senhor dos Anéis'),
 	(5, 5, 15, 'Harry Potter e a Pedra Filosofal');
 
---- INSERT 5 TEST VALUES IN USUARIOS ---
-
 INSERT INTO tb_usuarios (id_ra, nome) VALUES
 	(1125762433, 'Guilherme Menezes'),
 	(1093592837, 'Stephanie Rodrigues'),
 	(1116835101, 'Marcela de Lima'),
 	(1094326823, 'Nycole Alves'),
 	(1093592680, 'Jhennifer Rodrigues');
-
---- INSERT 5 TEST VALUES IN EMPRESTIMOS ---
 
 INSERT INTO tb_emprestimos (id_ra, id_livro, quantidade, data, prazo) VALUES
 	(1125762433, 2, 5, '2025-09-29', '2025-10-09'),

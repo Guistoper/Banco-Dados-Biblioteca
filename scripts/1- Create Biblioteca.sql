@@ -1,24 +1,16 @@
---- DATABASE CREATE ---
-
 DROP DATABASE IF EXISTS biblioteca;
 CREATE DATABASE biblioteca;
 USE biblioteca;
-
---- TABLE AUTORES CREATE ---
 
 CREATE TABLE tb_autores (
 	id_autor INT PRIMARY KEY AUTO_INCREMENT,
 	autor VARCHAR(100) NOT NULL
 );
 
---- TABLE GENEROS CREATE ---
-
 CREATE TABLE tb_generos (
 	id_genero INT PRIMARY KEY AUTO_INCREMENT,
 	genero VARCHAR(100) NOT NULL
 );
-
---- TABLE LIVROS CREATE ---
 
 CREATE TABLE tb_livros (
 	id_livro INT PRIMARY KEY AUTO_INCREMENT,
@@ -32,15 +24,11 @@ CREATE TABLE tb_livros (
 	FOREIGN KEY (id_genero) REFERENCES tb_generos(id_genero)
 );
 
---- TABLE USUARIOS CREATE ---
-
 CREATE TABLE tb_usuarios (
 	id_ra INT PRIMARY KEY NOT NULL,
 	nome VARCHAR(100) NOT NULL,
 	telefone VARCHAR(20)
 );
-
---- TABLE EMPRESTIMOS CREATE ---
 
 CREATE TABLE tb_emprestimos (
 	id_emp INT PRIMARY KEY AUTO_INCREMENT,

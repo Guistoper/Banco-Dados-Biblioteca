@@ -1,22 +1,9 @@
 import mysql.connector
+from database import Database
 
-class SQL:
-    _sql = mysql.connector.connect(
-            user="root",
-            password="552299",
-            host="localhost",
-            database="biblioteca" 
-    )
-
-class Database:
-    def select_view(table):
-        cursor = SQL._sql.cursor()
-        cursor.execute(f"SELECT * FROM {table}")
-        myresult = cursor.fetchall()
-        for data in myresult:
-            print(data)
+class Methods:
     def view_tables():
-        cursor = SQL._sql.cursor()
+        cursor = Database._sql.cursor()
         cursor.execute("""
             SELECT TABLE_NAME, TABLE_TYPE
             FROM INFORMATION_SCHEMA.TABLES
@@ -28,7 +15,19 @@ class Database:
                 print(f"{name} - View")
             elif type_ == "BASE TABLE":
                 print(f"{name} - Tabela")
-
-class Login:
-
-class Users:
+    def select_table(table):
+        cursor = Database._sql.cursor()
+        cursor.execute(f"SELECT * FROM {table}")
+        myresult = cursor.fetchall()
+        for data in myresult:
+            print(data)
+    def view_columns(table):
+        cursor = Database._sql.cursor()
+        cursor.execute(f"DESCRIBE {table}")
+        myresult = cursor.fetchall()
+        for col in myresult:
+            print(col)
+    def alter_table(table):
+        return
+    def insert_data(table, data):
+        return
