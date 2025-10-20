@@ -1,6 +1,12 @@
 import mysql.connector
-from database import Database
 
+class Database:
+    _sql = mysql.connector.connect(
+            user="root",
+            password="admin",
+            host="localhost",
+            database="biblioteca" 
+    )
 class Methods:
     def view_tables():
         cursor = Database._sql.cursor()
