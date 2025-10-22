@@ -68,12 +68,14 @@ class Methods:
         if table in tables:
             while True:
                 print("")
-                print("DEBUG ALTER TABLE\n")
+                print("DEBUG ALTER TABLE")
+                print("")
+                Methods._view_columns(table)
+                print("")
                 print("A - Add Column")
                 print("M - Modify Column")
                 print("D - Drop Column")
                 print("R - Rename Table")
-                print("S - Select Columns")
                 print("Q - Quit")
                 print("")
                 option = input("Select an option:\n")
@@ -120,13 +122,6 @@ class Methods:
                         print("")
                         print("Closing program...")
                         break
-                    case "s":
-                        print("")
-                        Methods._view_columns(table)
-                        print("")
-                        print("Press any key to continue...")
-                        msvcrt.getch()
-                        print("")
                     case "q":
                         print("")
                         print("Closing program...")
@@ -144,23 +139,18 @@ class Methods:
     def debug():
         while True:
             print("")
-            print("DEBUG BIBLIOTECA\n")
-            print("V1 - View Tables")
-            print("V2 - View Columns")
+            print("DEBUG BIBLIOTECA")
+            print("")
+            Methods._view_tables()
+            print("")
+            print("V - View Columns")
             print("S - Select Tables")
             print("A - Alter Tables")
             print("Q - Quit")
             print("")
             option = input("Select an option:\n")
             match option.lower():
-                case "v1":
-                    print("")
-                    Methods._view_tables()
-                    print("")
-                    print("Press any key to continue...")
-                    msvcrt.getch()
-                    print("")
-                case "v2":
+                case "v":
                     print("")
                     table = input("Select which table/view do you want to see:\n")
                     print("")

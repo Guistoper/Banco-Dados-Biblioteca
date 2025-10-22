@@ -29,12 +29,22 @@ class Scripts:
     def _main(database):
         try:
             if Scripts.__check_database(Database._cursor, database):
-                print(f"Database {database} found. \nStopping install...")
-                return database
-            print("Database not found. \nStarting install...")
-            Scripts.__run_scripts(Database._cursor, directory="Banco-Dados-Biblioteca\scripts")
-            Database._sql.commit()
-            print("Scripts runned sucessfully! \nStoping program...")
+                print(f"Database {database} found.")
+                option = input("Do you want to override? (Y/N)\n")
+                if option.lower() == "y":
+                    print("Starting install...")
+                    Scripts.__run_scripts(Database._cursor, directory="Banco-Dados-Biblioteca\\scripts")
+                    Database._sql.commit()
+                    print("Scripts runned sucessfully! \nStopping program...")
+                elif option.lower() == "n":
+                    print("Stopping program...")
+                else:
+                    print("Invalid option.")
+            else:
+                print("Database not found. \nStarting install...")
+                Scripts.__run_scripts(Database._cursor, directory="Banco-Dados-Biblioteca\\scripts")
+                Database._sql.commit()
+                print("Scripts runned sucessfully! \nStopping program...")            
         except mysql.connector.Error as err:
             print(f"MySQL connection failed: \n{err}")
             print("Running fallback operation...")
