@@ -10,7 +10,7 @@ class Database:
     )
     _cursor = _sql.cursor()
 class Methods:
-    def view_tables():
+    def _view_tables():
         Database._cursor.execute("""
             SELECT TABLE_NAME, TABLE_TYPE
             FROM INFORMATION_SCHEMA.TABLES
@@ -22,23 +22,23 @@ class Methods:
                 print(f"{name} - View")
             elif type_ == "BASE TABLE":
                 print(f"{name} - Tabela")    
-    def view_columns(table):
+    def _view_columns(table):
         Database._cursor.execute(f"DESCRIBE {table}")
         myresult = Database._cursor.fetchall()
         for col in myresult:
             print(col)
-    def select_table(table):
+    def _select_table(table):
         Database._cursor.execute(f"SELECT * FROM {table}")
         myresult = Database._cursor.fetchall()
         for data in myresult:
             print(data)
-    def alter_table(table):
-        def add_column(column, type):
+    def _alter_table(table):
+        def __add_column(column, type):
             query = f"ALTER TABLE {table} ADD COLUMN {column} {type}"
             Database._cursor.execute(query)
             Database._sql.commit()
             print(f"Column {column} {type} added to {table}")
-        def modify_column(column, type):
+        def __modify_column(column, type):
             query = f"ALTER TABLE {table} MODIFY COLUMN {column} {type}"
             Database._cursor.execute(f"DESCRIBE {table}")
             columns = [row[0] for row in Database._cursor.fetchall()]
@@ -48,7 +48,7 @@ class Methods:
                 print(f"Column {column} {type} modified from {table}")
             else:
                 print(f"Column {column} doesn't exist in {table}")
-        def drop_column(column):
+        def __drop_column(column):
             query = f"ALTER TABLE {table} DROP COLUMN {column}"
             Database._cursor.execute(f"DESCRIBE {table}")
             columns = [row[0] for row in Database._cursor.fetchall()]
@@ -58,7 +58,7 @@ class Methods:
                 print(f"Column {column} removed from {table}")
             else:
                 print(f"Column {column} doesn't exist in {table}")  
-        def rename_table(name):
+        def __rename_table(name):
             query = f"ALTER TABLE {table} RENAME TO {name}"
             Database._cursor.execute(query)
             Database._sql.commit()
@@ -68,7 +68,7 @@ class Methods:
         if table in tables:
             while True:
                 print("")
-                print("ALTER TABLE\n")
+                print("DEBUG ALTER TABLE\n")
                 print("A - Add Column")
                 print("M - Modify Column")
                 print("D - Drop Column")
@@ -84,7 +84,7 @@ class Methods:
                         print("")
                         type = input("What is the type of the column you want to add?\n")
                         print("")
-                        add_column(column, type)
+                        __add_column(column, type)
                         print("")
                         print("Press any key to continue...")
                         msvcrt.getch()
@@ -95,7 +95,7 @@ class Methods:
                         print("")
                         type = input("What is the type of the column you want to modify?\n")
                         print("")
-                        modify_column(column, type)
+                        __modify_column(column, type)
                         print("")
                         print("Press any key to continue...")
                         msvcrt.getch()
@@ -104,7 +104,7 @@ class Methods:
                         print("")
                         column = input("What is the name of the column that you want to remove?\n")
                         print("")
-                        drop_column(column)
+                        __drop_column(column)
                         print("")
                         print("Press any key to continue...")
                         msvcrt.getch()
@@ -113,7 +113,7 @@ class Methods:
                         print("")
                         name = input("What is the name that you want to rename the table to?\n")
                         print("")
-                        rename_table(name)
+                        __rename_table(name)
                         print("")
                         print("Press any key to continue...")
                         msvcrt.getch()
@@ -122,7 +122,7 @@ class Methods:
                         break
                     case "s":
                         print("")
-                        Methods.view_columns(table)
+                        Methods._view_columns(table)
                         print("")
                         print("Press any key to continue...")
                         msvcrt.getch()
@@ -144,7 +144,7 @@ class Methods:
     def debug():
         while True:
             print("")
-            print("BIBLIOTECA DATABASE\n")
+            print("DEBUG BIBLIOTECA\n")
             print("V1 - View Tables")
             print("V2 - View Columns")
             print("S - Select Tables")
@@ -155,7 +155,7 @@ class Methods:
             match option.lower():
                 case "v1":
                     print("")
-                    Methods.view_tables()
+                    Methods._view_tables()
                     print("")
                     print("Press any key to continue...")
                     msvcrt.getch()
@@ -164,7 +164,7 @@ class Methods:
                     print("")
                     table = input("Select which table/view do you want to see:\n")
                     print("")
-                    Methods.view_columns(table)
+                    Methods._view_columns(table)
                     print("")
                     print("Press any key to continue...")
                     msvcrt.getch()
@@ -173,7 +173,7 @@ class Methods:
                     print("")
                     table = input("Select which table/view do you want to see:\n")
                     print("")
-                    Methods.select_table(table)
+                    Methods._select_table(table)
                     print("")
                     print("Press any key to continue...")
                     msvcrt.getch()
@@ -182,7 +182,7 @@ class Methods:
                     print("")
                     table = input("Select which table/view do you want to alter:\n")
                     print("")
-                    Methods.alter_table(table)
+                    Methods._alter_table(table)
                 case "q":
                     print("")
                     print("Closing program...")
