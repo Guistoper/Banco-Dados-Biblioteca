@@ -30,25 +30,25 @@ class Scripts:
         try:
             if Scripts.__check_database(Database._cursor, database):
                 print(f"Database {database} found.")
-                option = input("Do you want to override? (Y/N)\n")
+                option = input("Do you want to override? (Y/N)")
                 if option.lower() == "y":
                     print("Starting install...")
                     Scripts.__run_scripts(Database._cursor, directory="Banco-Dados-Biblioteca\\scripts")
                     Database._sql.commit()
-                    print("Scripts runned sucessfully! \nStopping program...")
+                    print("Scripts runned sucessfully!\nStopping program...")
                 elif option.lower() == "n":
                     print("Stopping program...")
                 else:
-                    print("Invalid option.")
+                    print("Invalid option")
             else:
                 print("Database not found. \nStarting install...")
                 Scripts.__run_scripts(Database._cursor, directory="Banco-Dados-Biblioteca\\scripts")
                 Database._sql.commit()
-                print("Scripts runned sucessfully! \nStopping program...")            
+                print("Scripts runned sucessfully!\nStopping program...")            
         except mysql.connector.Error as err:
-            print(f"MySQL connection failed: \n{err}")
+            print(f"Error:\n{err}")
             print("Running fallback operation...")
             with open("fallback_log.txt", "a") as log:
-                log.write("MySQL connection failed.\n")
+                log.write("MySQL connection failed\n")
 
 Scripts._main("biblioteca")
