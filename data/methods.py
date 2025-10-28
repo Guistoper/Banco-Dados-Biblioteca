@@ -1,5 +1,6 @@
 import mysql.connector
 import msvcrt
+import re
 
 class Database:
     _sql = mysql.connector.connect(
@@ -173,7 +174,7 @@ class Methods:
                 user_columns = all_columns
             for col in user_columns:
                 if col not in all_columns:
-                    raise ValueError(f"Column '{col}' does not exist in table '{table}'")
+                    raise ValueError(f"Column {col} does not exist in table {table}")
             columns_str = f"({', '.join(user_columns)})"
             placeholders = ', '.join(['%s'] * len(user_columns))
             query = f"INSERT INTO {table} {columns_str} VALUES ({placeholders})"
@@ -182,10 +183,69 @@ class Methods:
                     raise ValueError(f"Row has {len(row)} values but table has {len(user_columns)} columns")
                 Database._cursor.execute(query, row)
             Database._sql.commit()
+            print(rows)
             print(f"{len(rows)} row(s) inserted into {table} successfully")
         except mysql.connector.Error as err:
             print(f"Error\n{err}")
-    def _update_data(table):
+    def _parse_where(where_str, valid_columns):
+        try:
+            if not where_str or where_str.strip() == "":
+                raise ValueError("WHERE condition cannot be empty for updates.")
+            parts = re.split(r'\s+AND\s+', where_str, flags=re.IGNORECASE)
+            clauses = []
+            params = []
+            for part in parts:
+                m = re.match(r'^\s*([`"]?([A-Za-z0-9_]+)[`"]?)\s*=\s*(.+?)\s*$', part)
+                if not m:
+                    raise ValueError(f"Unsupported WHERE clause format: '{part}'")
+                col = m.group(2)
+                val_raw = m.group(3).strip()
+                if col not in valid_columns:
+                    raise ValueError(f"Column {col} in WHERE does not exist in the table")
+                if re.fullmatch(r'NULL', val_raw, flags=re.IGNORECASE):
+                    clauses.append(f"{col} IS NULL")
+                    continue
+                if (val_raw.startswith("'") and val_raw.endswith("'")) or (val_raw.startswith('"') and val_raw.endswith('"')):
+                    val = val_raw[1:-1]
+                else:
+                    if re.fullmatch(r'-?\d+', val_raw):
+                        val = int(val_raw)
+                    elif re.fullmatch(r'-?\d+\.\d*', val_raw):
+                        val = float(val_raw)
+                    else:
+                        val = val_raw
+                params.append(val)
+                clauses.append(f"{col} = %s")
+            where_sql = ' AND '.join(clauses)
+            return where_sql, params
+        except Exception as e:
+            print(f"Error\n{e}")
+    def _update_data(table, where, rows, user_columns=None):
+        try:
+            Database._cursor.execute(f"DESCRIBE {table}")
+            table_columns_info = Database._cursor.fetchall()
+            all_columns = [col[0] for col in table_columns_info if 'auto_increment' not in col[5].lower()]
+            if user_columns is None:
+                user_columns = all_columns
+            for col in user_columns:
+                if col not in all_columns:
+                    raise ValueError(f"Column {col} does not exist in table {table}")
+            where_sql, where_params = Methods._parse_where(where, all_columns)
+            set_clause = ', '.join([f"{col} = %s" for col in user_columns])
+            query = f"UPDATE {table} SET {set_clause} WHERE {where_sql}"
+            for row in rows:
+                if len(row) != len(user_columns):
+                    raise ValueError(f"Row has {len(row)} values but {len(user_columns)} columns were specified")
+                params = list(row) + list(where_params)
+                Database._cursor.execute(query, params)
+            Database._sql.commit()
+            print(rows)
+            print(f"Row updated into {table} successfully")
+        except mysql.connector.Error as err:
+            print(f"Error\n{err}")
+        except Exception as e:
+            print(f"Error\n{e}")
+    def _delete_data(table, where):
         try:
             return
         except mysql.connector.Error as err:
@@ -196,11 +256,12 @@ class Methods:
             Methods._view_tables()
             print("\nC - Create Table")
             print("A - Alter Table")
-            print("D - Drop Table")
+            print("DT - Drop Table")
             print("V - View Table Columns")
-            print("S - Select Tables")
+            print("S - Select Data")
             print("I - Insert Data")
             print("U - Update Data")
+            print("DA - Delete Data")
             print("Q - Quit\n")
             option = input("Select an option:\n")
             match option.lower():
@@ -216,7 +277,7 @@ class Methods:
                     Methods._create_table(name, columns)
                     print("\nPress any key to continue...")
                     msvcrt.getch()
-                case "d":
+                case "dt":
                     table = input("\nSelect which table/view do you want to delete:\n")
                     if Methods._check_table(table) == False:
                         print(f"\nTable {table} doesn't exist")
@@ -292,6 +353,35 @@ class Methods:
                         print("\nPress any key to continue...")
                         msvcrt.getch()
                         continue
+                    print("")
+                    Methods._view_columns(table)
+                    print("")
+                    Methods._select_table(table)
+                    where = input("\nEnter WHERE condition (e.g id = 1 or nome = Guilherme Menezes):\n").strip()
+                    Database._cursor.execute(f"DESCRIBE {table}")
+                    table_columns_info = Database._cursor.fetchall()
+                    columns = [col[0] for col in table_columns_info]
+                    user_columns_input = input("\nEnter comma-separated column names to update (leave empty for all):\n").strip()
+                    if user_columns_input:
+                        user_columns = [col.strip() for col in user_columns_input.split(",")]
+                    else:
+                        user_columns = columns
+                    rows = []
+                    print("")
+                    data_input = input(f"Enter comma-separated new values (leave empty for NULL):\n")
+                    input_values = [value.strip() if value.strip() != "" else None for value in data_input.split(",")]
+                    if len(input_values) < len(user_columns):
+                        input_values += [None] * (len(user_columns) - len(input_values))
+                    elif len(input_values) > len(user_columns):
+                        print(f"Warning: You entered more values than expected ({len(user_columns)} columns)")
+                        input_values = input_values[:len(user_columns)]
+                    rows.append(input_values)
+                    print("")
+                    Methods._update_data(table, where, rows, user_columns)
+                    print("\nPress any key to continue...")
+                    msvcrt.getch()
+                case "da":
+                    break
                 case "q":
                     print("\nClosing program...")
                     break

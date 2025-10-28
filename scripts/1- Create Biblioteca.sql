@@ -15,8 +15,8 @@ CREATE TABLE tb_generos (
 CREATE TABLE tb_livros (
 	id_livro INT PRIMARY KEY AUTO_INCREMENT,
 	codigo INT,
-	id_autor INT NOT NULL,
-	id_genero INT NOT NULL,
+	id_autor INT,
+	id_genero INT,
 	quantidade INT NOT NULL,
 	livro VARCHAR(255) NOT NULL,
 	sinopse TEXT,
@@ -25,14 +25,14 @@ CREATE TABLE tb_livros (
 );
 
 CREATE TABLE tb_usuarios (
-	id_ra INT PRIMARY KEY NOT NULL,
+	id_ra BIGINT PRIMARY KEY NOT NULL,
 	nome VARCHAR(100) NOT NULL,
 	telefone VARCHAR(20)
 );
 
 CREATE TABLE tb_emprestimos (
 	id_emp INT PRIMARY KEY AUTO_INCREMENT,
-	id_ra INT NOT NULL,
+	id_ra BIGINT NOT NULL,
 	id_livro INT NOT NULL,
 	quantidade INT NOT NULL,
 	data DATE NOT NULL,
