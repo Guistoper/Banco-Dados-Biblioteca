@@ -9,11 +9,7 @@ class Database:
     )
     _cursor = _sql.cursor()
 class Scripts:
-    def __check_database(cursor, database):
-        Database._cursor.execute("SHOW DATABASES")
-        databases = [row[0] for row in Database._cursor.fetchall()]
-        return database in databases
-    def __run_scripts(cursor, directory):
+    def __run_scripts(directory):
         files = sorted(f for f in os.listdir(directory) if f.endswith(".sql"))
         for filename in files:
             path = os.path.join(directory, filename)
@@ -25,30 +21,23 @@ class Scripts:
                     try:
                         Database._cursor.execute(stmt)
                     except mysql.connector.Error as err:
-                        print(f"Error in {filename}: {err}")
+                        print(f"Error\n{err}")
+                    except Exception as e:
+                        print(f"Error\n{e}")
+    def _check_database(database):
+        Database._cursor.execute("SHOW DATABASES")
+        databases = [row[0] for row in Database._cursor.fetchall()]
+        return database in databases
     def _main(database):
         try:
-            if Scripts.__check_database(Database._cursor, database):
-                print(f"Database {database} found.")
-                option = input("Do you want to override? (Y/N)")
-                if option.lower() == "y":
-                    print("Starting install...")
-                    Scripts.__run_scripts(Database._cursor, directory="Banco-Dados-Biblioteca\\scripts")
-                    Database._sql.commit()
-                    print("Scripts runned sucessfully!\nStopping program...")
-                elif option.lower() == "n":
-                    print("Stopping program...")
-                else:
-                    print("Invalid option")
-            else:
-                print("Database not found. \nStarting install...")
-                Scripts.__run_scripts(Database._cursor, directory="Banco-Dados-Biblioteca\\scripts")
-                Database._sql.commit()
-                print("Scripts runned sucessfully!\nStopping program...")            
+            print("\nINSTALL DATABASE\n")
+            print("Database not found")
+            print("Starting install...")
+            Scripts.__run_scripts(directory="Banco-Dados-Biblioteca\\scripts")
+            Database._sql.commit()
+            print("Scripts runned sucessfully!")
+            print("Stopping program...")           
         except mysql.connector.Error as err:
-            print(f"Error:\n{err}")
-            print("Running fallback operation...")
-            with open("fallback_log.txt", "a") as log:
-                log.write("MySQL connection failed\n")
-
-Scripts._main("biblioteca")
+            print(f"Error\n{err}")
+        except Exception as e:
+            print(f"Error\n{e}")
