@@ -38,10 +38,10 @@ line 139:
 
 last line:
         class DashboardLogin(ctk.CTk):
-            def __init__(self):
+                def __init__(self):
                 super().__init__()
 
-                self.title("Sistema de Biblioteca - Login")
+                self.title("Login da Biblioteca")
                 self.geometry("1280x720")
                 self.minsize(854, 480)
                 self.resizable(True, True)
@@ -67,8 +67,8 @@ last line:
 
                 def error(wrong):
                     error = ctk.CTkToplevel(self, fg_color=BLUE_COLOR)
-                    error.title("Login da Biblioteca - Erro")            
-                    error.minsize(210, 0)
+                    error.title("Erro")            
+                    error.minsize(250, 0)
                     error.resizable(False, False)
                     error.transient(self)
                     error.grab_set()
@@ -84,18 +84,22 @@ last line:
                         error.destroy()
 
                     if wrong == 1:
-                        ctk.CTkLabel(content_frame, text="Usuário incorreto.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center").grid(row=0, column=0, pady=(15, 5), padx=20)
+                        error_title = ctk.CTkLabel(content_frame, text="Usuário incorreto.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
+                        error_title.grid(row=0, column=0, pady=(30, 15), padx=15)
                     elif wrong == 2:
-                        ctk.CTkLabel(content_frame, text="Senha incorreta.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center").grid(row=0, column=0, pady=(15, 5), padx=20)
+                        error_title = ctk.CTkLabel(content_frame, text="Senha incorreta.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
+                        error_title.grid(row=0, column=0, pady=(30, 15), padx=15)
                     elif wrong == 3:
-                        ctk.CTkLabel(content_frame, text="Preencha os campos obrigatórios.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center").grid(row=0, column=0, pady=(15, 5), padx=20)
+                        error_title = ctk.CTkLabel(content_frame, text="Preencha os campos obrigatórios.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
+                        error_title.grid(row=0, column=0, pady=(30, 15), padx=15)
                     elif wrong == 4:
-                        ctk.CTkLabel(content_frame, text="Usuário e senha incorretos.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center").grid(row=0, column=0, pady=(15, 5), padx=20)
+                        error_title = ctk.CTkLabel(content_frame, text="Usuário e senha incorretos.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
+                        error_title.grid(row=0, column=0, pady=(30, 15), padx=15)
 
-                    ctk.CTkButton(content_frame, text="Tentar novamente", fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, corner_radius=25, text_color=TEXT_COLOR_WHITE, command=close_error).grid(row=1, column=0, pady=(5, 20), ipady=5, ipadx=7, sticky="s")
+                    try_again = ctk.CTkButton(content_frame, text="Tentar novamente", fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, corner_radius=25, text_color=TEXT_COLOR_WHITE, command=close_error)
+                    try_again.grid(row=1, column=0, ipady=5, ipadx=7, sticky="s", pady=(5, 0))
 
                     error.update_idletasks()
-
                     req_width = error.winfo_reqwidth()
                     req_height = error.winfo_reqheight()
                     x = self.winfo_x() + (self.winfo_width() // 2) - (req_width // 2)
@@ -125,13 +129,10 @@ last line:
                         wrong = 4
                         error(wrong)
 
-                enter = ctk.CTkButton(frame, text="Entrar", command=login, corner_radius=25, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, text_color=TEXT_COLOR_WHITE, font=("Arial", 12, "bold"))
-                enter.pack(pady=(5, 10), ipadx=10, ipady=5)
+                enter_button = ctk.CTkButton(frame, text="Entrar", command=login, corner_radius=25, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, text_color=TEXT_COLOR_WHITE, font=("Arial", 12, "bold"))
+                enter_button.pack(pady=(5, 10), ipadx=10, ipady=5)
 
-                desc = ctk.CTkLabel(frame, text="Apenas para Administradores", text_color="gray", font=("Arial", 9))
-                desc.pack(pady=(0, 5))
+                footer_label = ctk.CTkLabel(frame, text="Apenas para Administradores", text_color="gray", font=("Arial", 9))
+                footer_label.pack(pady=(0, 5))
 
                 self.mainloop()
-
-app = DashboardApp(login_window=None)
-app.mainloop()

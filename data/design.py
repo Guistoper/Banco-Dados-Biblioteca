@@ -186,7 +186,7 @@ class DashboardApp(ctk.CTk):
         content_frame.grid_columnconfigure((0, 1), weight=1)
 
         popup_icon = ctk.CTkLabel(content_frame, text="🚪", text_color=TEXT_COLOR_BLACK, font=("Arial", 60))
-        popup_icon.grid(row=0, column=0, columnspan=2, pady=(10, 5))
+        popup_icon.grid(row=0, column=0, columnspan=2, pady=(40, 5))
 
         popup_title = ctk.CTkLabel(content_frame, text="Tem certeza que deseja sair?", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
         popup_title.grid(row=1, column=0, columnspan=2, pady=(5, 20))
@@ -675,7 +675,7 @@ class DashboardApp(ctk.CTk):
         content_frame.grid_columnconfigure((0, 1), weight=1)
 
         popup_icon = ctk.CTkLabel(content_frame, text=icon_text, text_color=TEXT_COLOR_BLACK, font=("Arial", 60))
-        popup_icon.grid(row=0, column=0, columnspan=2, pady=(10, 5))
+        popup_icon.grid(row=0, column=0, columnspan=2, pady=(40, 5))
 
         popup_title = ctk.CTkLabel(content_frame, text=title_text, text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
         popup_title.grid(row=1, column=0, columnspan=2, pady=(5, 20))
