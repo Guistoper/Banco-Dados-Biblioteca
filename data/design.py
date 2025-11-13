@@ -25,7 +25,7 @@ class DashboardApp(ctk.CTk):
         super().__init__()
 
         self.login_window = login_window
-        self.title("Sistema de Biblioteca")
+        self.title("Sistema Biblioteca")
         self.geometry("1280x720")
         self.minsize(854, 480)
         self.resizable(True, True)
@@ -186,18 +186,18 @@ class DashboardApp(ctk.CTk):
         content_frame.grid_columnconfigure((0, 1), weight=1)
 
         popup_icon = ctk.CTkLabel(content_frame, text="🚪", text_color=TEXT_COLOR_BLACK, font=("Arial", 60))
-        popup_icon.grid(row=0, column=0, columnspan=2, pady=(40, 5))
+        popup_icon.grid(row=0, column=0, columnspan=2, pady=(10, 5))
 
         popup_title = ctk.CTkLabel(content_frame, text="Tem certeza que deseja sair?", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
         popup_title.grid(row=1, column=0, columnspan=2, pady=(5, 20))
 
         cancel_button = ctk.CTkButton(content_frame, text="Cancelar", command=popup.destroy, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
-        cancel_button.grid(row=2, column=0, padx=10, pady=(0, 10), sticky="e")
+        cancel_button.grid(row=2, column=0, padx=10, pady=(0, 25), sticky="e")
         cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
         confirm_button = ctk.CTkButton(content_frame, text="Confirmar", command=self.close, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
-        confirm_button.grid(row=2, column=1, padx=10, pady=(0, 10), sticky="w")
+        confirm_button.grid(row=2, column=1, padx=10, pady=(0, 25), sticky="w")
         confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
 
@@ -659,6 +659,7 @@ class DashboardApp(ctk.CTk):
             title_text = "Empréstimo registrado! Deseja fazer outro?"
             icon_text = "📘"
         else:
+            title = "Adicionar "
             title_text = "Deseja adicionar outro?"
             icon_text = "➕"
         popup.title(title)
@@ -675,17 +676,17 @@ class DashboardApp(ctk.CTk):
         content_frame.grid_columnconfigure((0, 1), weight=1)
 
         popup_icon = ctk.CTkLabel(content_frame, text=icon_text, text_color=TEXT_COLOR_BLACK, font=("Arial", 60))
-        popup_icon.grid(row=0, column=0, columnspan=2, pady=(40, 5))
+        popup_icon.grid(row=0, column=0, columnspan=2, pady=(10, 5))
 
         popup_title = ctk.CTkLabel(content_frame, text=title_text, text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
-        popup_title.grid(row=1, column=0, columnspan=2, pady=(5, 20))
+        popup_title.grid(row=1, column=0, columnspan=2, pady=(5, 20), padx=20)
 
         def confirm_and_close():
             popup.destroy()
             self.close_screen()
 
         cancel_button = ctk.CTkButton(content_frame, text="Não", command=confirm_and_close, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
-        cancel_button.grid(row=2, column=0, padx=10, sticky="e")
+        cancel_button.grid(row=2, column=0, padx=10, pady=(0, 25), sticky="e")
         cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
@@ -695,7 +696,7 @@ class DashboardApp(ctk.CTk):
             add_function()
 
         confirm_button = ctk.CTkButton(content_frame, text="Sim", command=confirm_and_reopen, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
-        confirm_button.grid(row=2, column=1, padx=10, sticky="w")
+        confirm_button.grid(row=2, column=1, padx=10, pady=(0, 25), sticky="w")
         confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
 
