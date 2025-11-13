@@ -1,0 +1,138 @@
+line 56:
+        self.buttons["EMPRÉSTIMOS"] = self.create_sidebar_button("ADMINISTRAÇÃO", "👥", 3, self.show_loans)
+        self.buttons["DEVOLUÇÕES"] = self.create_sidebar_button("ADMINISTRAÇÃO", "🫰", 4, self.show_returns)
+        self.buttons["LIVROS"] = self.create_sidebar_button("ADMINISTRAÇÃO", "📘", 5, self.show_books)
+        self.buttons["CONFIGURACOES"] = self.create_sidebar_button("CONFIGURAÇÕES", "⚙️", 6, self.show_config)
+
+line 98:
+        if self.sidebar_visible:
+            self.sidebar_frame.grid_forget()
+            self.collapse_button.grid_forget()
+
+            self.expand_button_frame.grid(row=0, column=0, sticky="nsew")
+
+            self.main_frame.grid_forget()
+            self.main_frame.grid(row=0, column=1, sticky="nsew", columnspan=1)
+
+            self.grid_columnconfigure(0, weight=0)
+            self.grid_columnconfigure(1, weight=1)
+
+            self.sidebar_visible = False
+
+        else:
+            self.expand_button_frame.grid_forget()
+
+            self.grid_columnconfigure(0, weight=0)
+            self.grid_columnconfigure(1, weight=1)
+
+            self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
+            self.collapse_button.grid(row=0, column=0, padx=20, pady=20, sticky="n")
+
+            self.main_frame.grid_forget()
+            self.main_frame.grid(row=0, column=1, sticky="nsew")
+
+            self.sidebar_visible = True
+
+line 139:
+        self.login_window.deiconify()
+
+last line:
+        class DashboardLogin(ctk.CTk):
+            def __init__(self):
+                super().__init__()
+
+                self.title("Sistema de Biblioteca - Login")
+                self.geometry("1280x720")
+                self.minsize(854, 480)
+                self.resizable(True, True)
+
+                bg = ctk.CTkFrame(self, fg_color=BLUE_COLOR, corner_radius=0)
+                bg.pack(fill="both", expand=True)
+
+                frame = ctk.CTkFrame(bg, fg_color="white", corner_radius=25)
+                frame.place(relx=0.5, rely=0.5, anchor="center")
+
+                window_title = ctk.CTkLabel(frame, text="Login da Biblioteca", text_color=TEXT_COLOR_BLACK, font=("Arial", 16, "bold"))
+                window_title.pack(pady=(20, 10))
+
+                user_label = ctk.CTkLabel(frame, text="Nome de Usuário", text_color="gray", anchor="w")
+                user_label.pack(fill="x", padx=30)
+                user_entry = ctk.CTkEntry(frame, corner_radius=25, fg_color="#f0f0f0", border_width=0, text_color=TEXT_COLOR_BLACK, font=("Arial", 11))
+                user_entry.pack(fill="x", padx=30, pady=(0, 10), ipady=5)
+
+                word_label = ctk.CTkLabel(frame, text="Senha", text_color="gray", anchor="w")
+                word_label.pack(fill="x", padx=30)
+                word_entry = ctk.CTkEntry(frame, corner_radius=25, fg_color="#f0f0f0", border_width=0, text_color=TEXT_COLOR_BLACK, font=("Arial", 11), show="*")
+                word_entry.pack(fill="x", padx=30, pady=(0, 15), ipady=5)
+
+                def error(wrong):
+                    error = ctk.CTkToplevel(self, fg_color=BLUE_COLOR)
+                    error.title("Login da Biblioteca - Erro")            
+                    error.minsize(210, 0)
+                    error.resizable(False, False)
+                    error.transient(self)
+                    error.grab_set()
+
+                    error.grid_columnconfigure(0, weight=1)
+                    error.grid_rowconfigure(0, weight=1)
+
+                    content_frame = ctk.CTkFrame(error, fg_color="white", corner_radius=25)
+                    content_frame.pack(fill="both", expand=True, padx=10, pady=10)
+                    content_frame.grid_columnconfigure(0, weight=1)
+
+                    def close_error():
+                        error.destroy()
+
+                    if wrong == 1:
+                        ctk.CTkLabel(content_frame, text="Usuário incorreto.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center").grid(row=0, column=0, pady=(15, 5), padx=20)
+                    elif wrong == 2:
+                        ctk.CTkLabel(content_frame, text="Senha incorreta.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center").grid(row=0, column=0, pady=(15, 5), padx=20)
+                    elif wrong == 3:
+                        ctk.CTkLabel(content_frame, text="Preencha os campos obrigatórios.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center").grid(row=0, column=0, pady=(15, 5), padx=20)
+                    elif wrong == 4:
+                        ctk.CTkLabel(content_frame, text="Usuário e senha incorretos.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center").grid(row=0, column=0, pady=(15, 5), padx=20)
+
+                    ctk.CTkButton(content_frame, text="Tentar novamente", fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, corner_radius=25, text_color=TEXT_COLOR_WHITE, command=close_error).grid(row=1, column=0, pady=(5, 20), ipady=5, ipadx=7, sticky="s")
+
+                    error.update_idletasks()
+
+                    req_width = error.winfo_reqwidth()
+                    req_height = error.winfo_reqheight()
+
+                    x = self.winfo_x() + (self.winfo_width() // 2) - (req_width // 2)
+                    y = self.winfo_y() + (self.winfo_height() // 2) - (req_height // 2)
+                    error.geometry(f"{req_width}x{req_height}+{x}+{y}")
+
+                def login():
+                    user = user_entry.get()
+                    password = word_entry.get()
+                    right = {user: "admin", password: "admin"}
+                    wrong = 0
+
+                    if user == right[user] and password == right[password]:
+                        self.withdraw()
+                        dashboard_app = DashboardApp(login_window=self)
+                        dashboard_app.mainloop()
+                    elif user != right[user] and password == right[password]:
+                        wrong = 1
+                        error(wrong)
+                    elif user == right[user] and password != right[password]:
+                        wrong = 2
+                        error(wrong)
+                    elif user == "" or password == "":
+                        wrong = 3
+                        error(wrong)
+                    else:
+                        wrong = 4
+                        error(wrong)
+
+                enter = ctk.CTkButton(frame, text="Entrar", command=login, corner_radius=25, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, text_color=TEXT_COLOR_WHITE, font=("Arial", 12, "bold"))
+                enter.pack(pady=(5, 10), ipadx=10, ipady=5)
+
+                desc = ctk.CTkLabel(frame, text="Apenas para Administradores", text_color="gray", font=("Arial", 9))
+                desc.pack(pady=(0, 5))
+
+                self.mainloop()
+
+app = DashboardApp(login_window=None)
+app.mainloop()

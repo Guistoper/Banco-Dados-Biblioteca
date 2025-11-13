@@ -1,19 +1,13 @@
 import mysql.connector
 import msvcrt
 import re
-from install import Scripts
 
 class Database:
-    if Scripts._check_database("biblioteca") == True:
-        db = "biblioteca"
-    else:
-        Scripts._main("biblioteca")
-        db = "biblioteca"
     _sql = mysql.connector.connect(
             user="root",
             password="admin",
             host="localhost",
-            database = db
+            database = "biblioteca"
     )
     _cursor = _sql.cursor()
 class Methods:
