@@ -98,7 +98,6 @@ last line:
 
                     req_width = error.winfo_reqwidth()
                     req_height = error.winfo_reqheight()
-
                     x = self.winfo_x() + (self.winfo_width() // 2) - (req_width // 2)
                     y = self.winfo_y() + (self.winfo_height() // 2) - (req_height // 2)
                     error.geometry(f"{req_width}x{req_height}+{x}+{y}")

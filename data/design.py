@@ -25,7 +25,7 @@ class DashboardApp(ctk.CTk):
         super().__init__()
 
         self.login_window = login_window
-        self.title("Sistema de Biblioteca - Administração")
+        self.title("Sistema de Biblioteca")
         self.geometry("1280x720")
         self.minsize(854, 480)
         self.resizable(True, True)
@@ -174,6 +174,7 @@ class DashboardApp(ctk.CTk):
         popup = ctk.CTkToplevel(self, fg_color="white")
         popup.title("Sair")
         popup.minsize(250, 0)
+        popup.resizable(False, False)
         popup.transient(self)
         popup.grab_set()
 
@@ -200,6 +201,7 @@ class DashboardApp(ctk.CTk):
         confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
 
+        popup.update_idletasks()
         req_width = popup.winfo_reqwidth()
         req_height = popup.winfo_reqheight()
         x = self.winfo_x() + (self.winfo_width() // 2) - (req_width // 2)
@@ -263,7 +265,7 @@ class DashboardApp(ctk.CTk):
         search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
         search_icon.pack(side="left", padx=(10, 2))
 
-        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar...", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK)
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar...", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
         search_entry.pack(side="left", expand=True, fill="x", ipady=5)
 
         filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
@@ -319,7 +321,7 @@ class DashboardApp(ctk.CTk):
         search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
         search_icon.pack(side="left", padx=(10, 2))
 
-        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar...", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK)
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar...", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
         search_entry.pack(side="left", expand=True, fill="x", ipady=5)
 
         filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
@@ -375,7 +377,7 @@ class DashboardApp(ctk.CTk):
         search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
         search_icon.pack(side="left", padx=(10, 2))
 
-        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar...", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK)
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar...", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
         search_entry.pack(side="left", expand=True, fill="x", ipady=5)
 
         filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
@@ -417,7 +419,7 @@ class DashboardApp(ctk.CTk):
         row_index = 0
 
         top_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        top_frame.grid(row=row_index, column=0, sticky="ew", padx=25, pady=(18, 15))
+        top_frame.grid(row=row_index, column=0, sticky="ew", padx=25, pady=(17.5, 15))
         top_frame.grid_columnconfigure(0, weight=0)
         top_frame.grid_columnconfigure(1, weight=1)
         top_frame.grid_columnconfigure(2, weight=0)
@@ -431,7 +433,7 @@ class DashboardApp(ctk.CTk):
         search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
         search_icon.pack(side="left", padx=(10, 2))
 
-        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar...", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK)
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar...", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
         search_entry.pack(side="left", expand=True, fill="x", ipady=5)
 
         filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
@@ -517,12 +519,12 @@ class DashboardApp(ctk.CTk):
         button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
         button_frame.grid(row=row_index, column=1, columnspan=2, sticky="s", pady=(20, 10))
 
-        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=None, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=self.close_screen, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         cancel_button.grid(row=0, column=0, sticky="e", padx=10, pady=(0, 10))
         cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
-        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=None, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.confirm_add(self.add_user), fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         confirm_button.grid(row=0, column=1, sticky="w", padx=10, pady=(0, 10))
         confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
@@ -571,12 +573,12 @@ class DashboardApp(ctk.CTk):
         button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
         button_frame.grid(row=row_index, column=1, columnspan=2, sticky="s", pady=(20, 10))
 
-        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=None, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=self.close_screen, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         cancel_button.grid(row=0, column=0, sticky="e", padx=10, pady=(0, 10))
         cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
-        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=None, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.confirm_add(self.add_book), fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         confirm_button.grid(row=0, column=1, sticky="w", padx=10, pady=(0, 10))
         confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
@@ -617,15 +619,92 @@ class DashboardApp(ctk.CTk):
         button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
         button_frame.grid(row=row_index, column=1, columnspan=2, sticky="s", pady=(20, 10))
 
-        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=None, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=self.close_screen, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         cancel_button.grid(row=0, column=0, sticky="e", padx=10, pady=(0, 10))
         cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
-        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=None, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.confirm_add(self.make_loan), fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         confirm_button.grid(row=0, column=1, sticky="w", padx=10, pady=(0, 10))
         confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
+    
+    def close_screen(self):
+        match self.active_button_name:
+            case "USUÁRIOS":
+                self.show_users()
+            case "LIVROS":
+                self.show_books()
+            case "EMPRÉSTIMOS":
+                self.show_loans()
+            case "ADMINISTRAÇÃO":
+                self.show_admin()
+            case "DEVOLUÇÕES":
+                self.show_returns()
+            case _:
+                self.show_admin()
+
+    def confirm_add(self, add_function):
+        popup = ctk.CTkToplevel(self, fg_color="white")
+        if add_function == self.add_user:
+            title = "Adicionar outro usuário?"
+            title_text = "Usuário adicionado! Deseja adicionar outro?"
+            icon_text = "👤"
+        elif add_function == self.add_book:
+            title = "Adicionar outro livro?"
+            title_text = "Livro adicionado! Deseja adicionar outro?"
+            icon_text = "📖"
+        elif add_function == self.make_loan:
+            title = "Fazer outro empréstimo?"
+            title_text = "Empréstimo registrado! Deseja fazer outro?"
+            icon_text = "📘"
+        else:
+            title_text = "Deseja adicionar outro?"
+            icon_text = "➕"
+        popup.title(title)
+        popup.minsize(250, 0)
+        popup.resizable(False, False)
+        popup.transient(self)
+        popup.grab_set()
+
+        popup.grid_columnconfigure(0, weight=1)
+        popup.grid_rowconfigure(0, weight=1)
+
+        content_frame = ctk.CTkFrame(popup, fg_color="white", corner_radius=0)
+        content_frame.pack(fill="both", expand=True)
+        content_frame.grid_columnconfigure((0, 1), weight=1)
+
+        popup_icon = ctk.CTkLabel(content_frame, text=icon_text, text_color=TEXT_COLOR_BLACK, font=("Arial", 60))
+        popup_icon.grid(row=0, column=0, columnspan=2, pady=(10, 5))
+
+        popup_title = ctk.CTkLabel(content_frame, text=title_text, text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
+        popup_title.grid(row=1, column=0, columnspan=2, pady=(5, 20))
+
+        def confirm_and_close():
+            popup.destroy()
+            self.close_screen()
+
+        cancel_button = ctk.CTkButton(content_frame, text="Não", command=confirm_and_close, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
+        cancel_button.grid(row=2, column=0, padx=10, sticky="e")
+        cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
+        cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
+
+        def confirm_and_reopen():
+            popup.destroy()
+            self.clear_main_frame()
+            add_function()
+
+        confirm_button = ctk.CTkButton(content_frame, text="Sim", command=confirm_and_reopen, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
+        confirm_button.grid(row=2, column=1, padx=10, sticky="w")
+        confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
+        confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
+
+        popup.update_idletasks()
+        req_width = popup.winfo_reqwidth()
+        req_height = popup.winfo_reqheight()
+        x = self.winfo_x() + (self.winfo_width() // 2) - (req_width // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (req_height // 2)
+        popup.geometry(f"{req_width}x{req_height}+{x}+{y}")
         
 app = DashboardApp(login_window=None)
 app.mainloop()
