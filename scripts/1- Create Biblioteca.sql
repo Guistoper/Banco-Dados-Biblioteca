@@ -29,7 +29,7 @@ CREATE TABLE tb_emprestimos (
 	data DATE NOT NULL,
 	prazo DATE NOT NULL,
 	devolvido BOOLEAN NOT NULL,
-	atraso BOOLEAN,
+	em_atraso BOOLEAN NOT NULL,
 	FOREIGN KEY (id_usa) REFERENCES tb_usuarios(id_usa),
 	FOREIGN KEY (id_liv) REFERENCES tb_livros(id_liv)
 )

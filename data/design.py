@@ -276,7 +276,7 @@ class DashboardApp(ctk.CTk):
         search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
         search_icon.pack(side="left", padx=(10, 2))
 
-        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: livro=Dom Quixote)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: Dom Quixote)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
         search_entry.pack(side="left", expand=True, fill="x", ipady=5)
         search_entry.bind("<Return>", self.filter_books)
         search_entry.bind("<KeyRelease>", self.on_search_key)
@@ -377,7 +377,7 @@ class DashboardApp(ctk.CTk):
         search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
         search_icon.pack(side="left", padx=(10, 2))
 
-        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: nome=Guilherme Menezes Silva)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: Guilherme Menezes Silva)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
         search_entry.pack(side="left", expand=True, fill="x", ipady=5)
         search_entry.bind("<Return>", self.filter_users)
         search_entry.bind("<KeyRelease>", self.on_search_key)
@@ -478,7 +478,7 @@ class DashboardApp(ctk.CTk):
         search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
         search_icon.pack(side="left", padx=(10, 2))
 
-        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: prazo=15112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: 15112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
         search_entry.pack(side="left", expand=True, fill="x", ipady=5)
         search_entry.bind("<Return>", self.filter_loans)
         search_entry.bind("<KeyRelease>", self.on_search_key)
@@ -498,7 +498,7 @@ class DashboardApp(ctk.CTk):
         conn = Database._sql
         cursor = conn.cursor()
 
-        query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = False)"
+        query = "SELECT * FROM emprestimos WHERE (devolvido = False AND em_atraso = False)"
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -529,10 +529,10 @@ class DashboardApp(ctk.CTk):
         cursor = conn.cursor()
 
         if search_text == "":
-            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = False)"
+            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND em_atraso = False)"
             cursor.execute(query)
         else:
-            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = False) AND (nome LIKE %s OR tipo LIKE %s OR livro LIKE %s OR data LIKE %s OR prazo LIKE %s)"
+            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND em_atraso = False) AND (nome LIKE %s OR tipo LIKE %s OR livro LIKE %s OR data LIKE %s OR prazo LIKE %s)"
             like = f"%{search_text}%"
             cursor.execute(query, (like, like, like, like, like))
 
@@ -579,7 +579,7 @@ class DashboardApp(ctk.CTk):
         search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
         search_icon.pack(side="left", padx=(10, 2))
 
-        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: data=25112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: 25112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
         search_entry.pack(side="left", expand=True, fill="x", ipady=5)
         search_entry.bind("<Return>", self.filter_returns)
         search_entry.bind("<KeyRelease>", self.on_search_key)
@@ -596,7 +596,7 @@ class DashboardApp(ctk.CTk):
         conn = Database._sql
         cursor = conn.cursor()
 
-        query = "SELECT * FROM emprestimos WHERE (devolvido = True AND atraso = False)"
+        query = "SELECT * FROM emprestimos WHERE (devolvido = True AND em_atraso = False)"
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -627,10 +627,10 @@ class DashboardApp(ctk.CTk):
         cursor = conn.cursor()
 
         if search_text == "":
-            query = "SELECT * FROM emprestimos WHERE (devolvido = True AND atraso = False)"
+            query = "SELECT * FROM emprestimos WHERE (devolvido = True AND em_atraso = False)"
             cursor.execute(query)
         else:
-            query = "SELECT * FROM emprestimos WHERE (devolvido = True AND atraso = False) AND (nome LIKE %s OR tipo LIKE %s OR livro LIKE %s OR data LIKE %s OR prazo LIKE %s)"
+            query = "SELECT * FROM emprestimos WHERE (devolvido = True AND em_atraso = False) AND (nome LIKE %s OR tipo LIKE %s OR livro LIKE %s OR data LIKE %s OR prazo LIKE %s)"
             like = f"%{search_text}%"
             cursor.execute(query, (like, like, like, like, like))
 
@@ -677,7 +677,7 @@ class DashboardApp(ctk.CTk):
         search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
         search_icon.pack(side="left", padx=(10, 2))
 
-        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: data=25112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: 25112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
         search_entry.pack(side="left", expand=True, fill="x", ipady=5)
         search_entry.bind("<Return>", self.filter_delayed)
         search_entry.bind("<KeyRelease>", self.on_search_key)
@@ -694,7 +694,7 @@ class DashboardApp(ctk.CTk):
         conn = Database._sql
         cursor = conn.cursor()
 
-        query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = True)"
+        query = "SELECT * FROM emprestimos WHERE (devolvido = False AND em_atraso = True)"
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -725,10 +725,10 @@ class DashboardApp(ctk.CTk):
         cursor = conn.cursor()
 
         if search_text == "":
-            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = True)"
+            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND em_atraso = True)"
             cursor.execute(query)
         else:
-            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = True) AND (nome LIKE %s OR tipo LIKE %s OR livro LIKE %s OR data LIKE %s OR prazo LIKE %s)"
+            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND em_atraso = True) AND (nome LIKE %s OR tipo LIKE %s OR livro LIKE %s OR data LIKE %s OR prazo LIKE %s)"
             like = f"%{search_text}%"
             cursor.execute(query, (like, like, like, like, like))
 
