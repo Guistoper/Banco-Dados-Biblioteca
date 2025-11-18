@@ -42,7 +42,7 @@ class DashboardApp(ctk.CTk):
     def setup(self):
         self.sidebar_frame = ctk.CTkFrame(self, fg_color=BLUE_COLOR, corner_radius=0)
         self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(6, weight=1)
+        self.sidebar_frame.grid_rowconfigure(7, weight=1)
 
         self.collapse_button = ctk.CTkButton(self.sidebar_frame, text="←", fg_color=LIGHT_COLOR, hover_color=BLUE_COLOR_HOVER, text_color=TEXT_COLOR_BLACK, font=("Arial", 24), width=20, command=self.toggle_sidebar)
         self.collapse_button.grid(row=0, column=0, padx=20, pady=20, sticky="n")
@@ -54,8 +54,9 @@ class DashboardApp(ctk.CTk):
         self.buttons["USUÁRIOS"] = self.create_sidebar_button("USUÁRIOS", 3, self.show_users)        
         self.buttons["EMPRÉSTIMOS"] = self.create_sidebar_button("EMPRÉSTIMOS", 4, self.show_loans)
         self.buttons["DEVOLUÇÕES"] = self.create_sidebar_button("DEVOLUÇÕES", 5, self.show_returns)
+        self.buttons["ATRASOS"] = self.create_sidebar_button("ATRASOS", 6, self.show_delayed)
 
-        self.buttons["SAIR"] = self.create_sidebar_button("SAIR", 7, self.logout)
+        self.buttons["SAIR"] = self.create_sidebar_button("SAIR", 8, self.logout)
 
         self.main_frame = ctk.CTkFrame(self, fg_color="white", corner_radius=0)
         self.main_frame.grid(row=0, column=1, sticky="nsew")
@@ -248,6 +249,8 @@ class DashboardApp(ctk.CTk):
                     self.filter_loans(event)
                 case "DEVOLUÇÕES":
                     self.filter_returns(event)
+                case "ATRASOS":
+                    self.filter_delayed(event)
 
     def show_books(self):
         self.clear_main_frame()
@@ -327,16 +330,7 @@ class DashboardApp(ctk.CTk):
             query = "SELECT * FROM livros"
             cursor.execute(query)
         else:
-            query = """
-                SELECT * FROM livros
-                WHERE 
-                    livro LIKE %s
-                    OR autor LIKE %s
-                    OR genero LIKE %s
-                    OR ano LIKE %s
-                    OR editora LIKE %s
-                    OR sinopse LIKE %s
-            """
+            query = "SELECT * FROM livros WHERE (livro LIKE %s OR autor LIKE %s OR genero LIKE %s OR ano LIKE %s OR editora LIKE %s OR sinopse LIKE %s)"
             like = f"%{search_text}%"
             cursor.execute(query, (like, like, like, like, like, like))
 
@@ -437,15 +431,7 @@ class DashboardApp(ctk.CTk):
             query = "SELECT * FROM usuarios"
             cursor.execute(query)
         else:
-            query = """
-                SELECT * FROM usuarios
-                WHERE 
-                    nome LIKE %s
-                    OR tipo LIKE %s
-                    OR sala LIKE %s
-                    OR email LIKE %s
-                    OR telefone LIKE %s
-            """
+            query = "SELECT * FROM usuarios WHERE (nome LIKE %s OR tipo LIKE %s OR sala LIKE %s OR email LIKE %s OR telefone LIKE %s)"
             like = f"%{search_text}%"
             cursor.execute(query, (like, like, like, like, like))
 
@@ -512,7 +498,7 @@ class DashboardApp(ctk.CTk):
         conn = Database._sql
         cursor = conn.cursor()
 
-        query = "SELECT * FROM emprestimos"
+        query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = False)"
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -543,22 +529,12 @@ class DashboardApp(ctk.CTk):
         cursor = conn.cursor()
 
         if search_text == "":
-            query = "SELECT * FROM emprestimos"
+            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = False)"
             cursor.execute(query)
         else:
-            query = """
-                SELECT * FROM emprestimos
-                WHERE 
-                    id_emp LIKE %s
-                    OR  usuario LIKE %s
-                    OR  livro LIKE %s
-                    OR  tipo LIKE %s
-                    OR  data LIKE %s
-                    OR  prazo LIKE %s
-                    OR  atraso LIKE %s
-            """
+            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = False) AND (nome LIKE %s OR tipo LIKE %s OR livro LIKE %s OR data LIKE %s OR prazo LIKE %s)"
             like = f"%{search_text}%"
-            cursor.execute(query, (like, like, like, like, like, like, like))
+            cursor.execute(query, (like, like, like, like, like))
 
         rows = cursor.fetchall()
 
@@ -620,7 +596,7 @@ class DashboardApp(ctk.CTk):
         conn = Database._sql
         cursor = conn.cursor()
 
-        query = "SELECT * FROM emprestimos WHERE devolvido = True"
+        query = "SELECT * FROM emprestimos WHERE (devolvido = True AND atraso = False)"
         cursor.execute(query)
         rows = cursor.fetchall()
 
@@ -651,23 +627,110 @@ class DashboardApp(ctk.CTk):
         cursor = conn.cursor()
 
         if search_text == "":
-            query = "SELECT * FROM emprestimos"
+            query = "SELECT * FROM emprestimos WHERE (devolvido = True AND atraso = False)"
             cursor.execute(query)
         else:
-            query = """
-                    SELECT * FROM emprestimos
-                    WHERE devolvido = True
-                    AND (
-                    id_emp LIKE %s
-                    OR  usuario LIKE %s
-                    OR  livro LIKE %s
-                    OR  tipo LIKE %s
-                    OR  data LIKE %s
-                    OR  prazo LIKE %s
-                    )
-                    """
+            query = "SELECT * FROM emprestimos WHERE (devolvido = True AND atraso = False) AND (nome LIKE %s OR tipo LIKE %s OR livro LIKE %s OR data LIKE %s OR prazo LIKE %s)"
             like = f"%{search_text}%"
-            cursor.execute(query, (like, like, like, like, like, like))
+            cursor.execute(query, (like, like, like, like, like))
+
+        rows = cursor.fetchall()
+
+        for widget in self.table_frame.winfo_children():
+            widget.destroy()
+
+        if len(rows) == 0:
+            placeholder = ctk.CTkLabel(self.table_frame, text="Nenhum resultado encontrado.", text_color="gray", font=("Arial", 14, "bold"))
+            placeholder.grid(row=0, column=0, sticky="nsew", pady=10)
+            return
+
+        for col_index, col_name in enumerate(self.column_names):
+            header = ctk.CTkLabel(self.table_frame, text=col_name.upper(), font=("Arial", 14, "bold"), text_color=TEXT_COLOR_BLACK)
+            header.grid(row=0, column=col_index, padx=10, pady=10, sticky="nsew")
+
+        for row_i, row_data in enumerate(rows, start=1):
+            for col_j, value in enumerate(row_data):
+                cell = ctk.CTkLabel(self.table_frame, text=str(value), text_color=TEXT_COLOR_BLACK, font=("Arial", 12))
+                cell.grid(row=row_i, column=col_j, padx=5, pady=5, sticky="nsew")
+
+    def show_delayed(self):
+        self.clear_main_frame()
+
+        self.main_frame.grid_columnconfigure(0, weight=1)
+        self.main_frame.grid_columnconfigure((1, 2, 3), weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+
+        row_index = 0
+
+        top_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        top_frame.grid(row=row_index, column=0, sticky="ew", padx=25, pady=(17.5, 15))
+        top_frame.grid_columnconfigure(0, weight=0)
+        top_frame.grid_columnconfigure(1, weight=1)
+        top_frame.grid_columnconfigure(2, weight=0)
+
+        title = ctk.CTkLabel(top_frame, text="ATRASOS", fg_color="transparent", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
+        title.grid(row=0, column=0, sticky="w", padx=(0, 20))
+
+        search_frame = ctk.CTkFrame(top_frame, fg_color=LIGHT_PURPLE_COLOR, corner_radius=25)
+        search_frame.grid(row=0, column=1, sticky="ew",)
+
+        search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
+        search_icon.pack(side="left", padx=(10, 2))
+
+        search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: data=25112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
+        search_entry.pack(side="left", expand=True, fill="x", ipady=5)
+        search_entry.bind("<Return>", self.filter_delayed)
+        search_entry.bind("<KeyRelease>", self.on_search_key)
+
+        filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
+        filter_button.pack(side="right", padx=10)
+
+        row_index += 1
+
+        table_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="white", corner_radius=25)
+        table_frame.grid(row=row_index, column=0, sticky="nsew")
+        table_frame.grid_columnconfigure(0, weight=1)
+
+        conn = Database._sql
+        cursor = conn.cursor()
+
+        query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = True)"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        column_names = [desc[0] for desc in cursor.description]
+
+        self.table_frame = table_frame
+        self.column_names = column_names
+
+        if len(rows) == 0:
+            placeholder = ctk.CTkLabel(table_frame, text="Nenhum atraso registrado.", text_color="gray", font=("Arial", 14, "bold"))
+            placeholder.grid(row=0, column=0, sticky="nsew", pady=10)
+        else:
+            table_frame.grid_columnconfigure(tuple(range(len(column_names))), weight=1)
+
+            for col_index, col_name in enumerate(column_names):
+                header = ctk.CTkLabel(table_frame, text=col_name.upper(), font=("Arial", 14, "bold"), text_color=TEXT_COLOR_BLACK)
+                header.grid(row=0, column=col_index, padx=10, pady=10, sticky="nsew")
+
+            for row_i, row_data in enumerate(rows, start=1):
+                for col_j, value in enumerate(row_data):
+                    cell = ctk.CTkLabel(table_frame, text=str(value), text_color=TEXT_COLOR_BLACK, font=("Arial", 12))
+                    cell.grid(row=row_i, column=col_j, padx=5, pady=5, sticky="nsew")
+
+    def filter_delayed(self, event=None):
+        search_text = event.widget.get().strip()
+
+        conn = Database._sql
+        cursor = conn.cursor()
+
+        if search_text == "":
+            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = True)"
+            cursor.execute(query)
+        else:
+            query = "SELECT * FROM emprestimos WHERE (devolvido = False AND atraso = True) AND (nome LIKE %s OR tipo LIKE %s OR livro LIKE %s OR data LIKE %s OR prazo LIKE %s)"
+            like = f"%{search_text}%"
+            cursor.execute(query, (like, like, like, like, like))
 
         rows = cursor.fetchall()
 
