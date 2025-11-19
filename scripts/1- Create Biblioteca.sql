@@ -28,8 +28,7 @@ CREATE TABLE tb_emprestimos (
 	quantidade INT NOT NULL,
 	data DATE NOT NULL,
 	prazo DATE NOT NULL,
-	devolvido BOOLEAN NOT NULL,
-	em_atraso BOOLEAN NOT NULL,
+	status VARCHAR(9),
 	FOREIGN KEY (id_usa) REFERENCES tb_usuarios(id_usa),
 	FOREIGN KEY (id_liv) REFERENCES tb_livros(id_liv)
 )
