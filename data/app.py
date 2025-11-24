@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 from CTkTable import *
 from install import Install
+from datetime import datetime
 
 BLUE_COLOR = "#206eff" 
 BLUE_COLOR_HOVER = "#0c50ce"  
@@ -291,8 +292,6 @@ class DashboardApp(ctk.CTk):
             self.general_filter()
 
     def general_filter(self, event=None):
-        from datetime import datetime
-
         if event:
             search_text = event.widget.get().strip()
         else:
@@ -433,6 +432,8 @@ class DashboardApp(ctk.CTk):
                             
                             table.edit_row(row_visual_index, fg_color="#C53030", hover_color="#9B2C2C")
 
+    
+
     def show_books(self):
         self.clear_main_frame()
 
@@ -478,6 +479,101 @@ class DashboardApp(ctk.CTk):
 
         self.general_filter()
 
+    def add_book(self):
+        self.popup_book = ctk.CTkToplevel(self, fg_color="white")
+        self.popup_book.title("Adicionar Livro")
+        self.popup_book.minsize(250, 0)
+        self.popup_book.resizable(False, False)
+        self.popup_book.transient(self)
+        self.popup_book.grab_set()
+
+        self.popup_book.grid_columnconfigure(0, weight=1)
+        self.popup_book.grid_columnconfigure((1, 2, 3, 4), weight=0)
+        self.popup_book.grid_rowconfigure((0, 2), weight=0)
+        self.popup_book.grid_rowconfigure((1, 3), weight=1)
+
+        form_frame = ctk.CTkFrame(self.popup_book, fg_color="white")
+        form_frame.grid(row=2, column=0, sticky="n", padx=20, pady=10)
+        form_frame.grid_columnconfigure(0, weight=0)
+        form_frame.grid_columnconfigure(1, weight=1)
+
+        row_index = 0
+
+        obs_label = ctk.CTkLabel(form_frame, text="Os campos com * são obrigatórios", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
+        obs_label.grid(row=row_index, column=1, ipady=5)
+
+        row_index += 1
+
+        book_label = ctk.CTkLabel(form_frame, text="*Nome: \n(ex: Dom Quixote):", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
+        book_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5), ipady=5)
+
+        book_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
+        book_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
+
+        row_index += 1
+
+        author_label = ctk.CTkLabel(form_frame, text="*Autor \n(Miguel de Cervantes):", text_color="black", font=("Arial", 11, "bold"), anchor="w")
+        author_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
+
+        author_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
+        author_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
+
+        row_index += 1
+
+        genre_label = ctk.CTkLabel(form_frame, text="*Gênero \n(ex: Romance):", text_color="black", font=("Arial", 11, "bold"), anchor="w")
+        genre_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
+
+        genre_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
+        genre_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
+
+        row_index += 1
+
+        editora_label = ctk.CTkLabel(form_frame, text="*Editora \n(ex: Editora Garnier):", text_color="black", font=("Arial", 11, "bold"), anchor="w")
+        editora_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
+
+        editora_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
+        editora_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
+
+        row_index += 1
+
+        ano_label = ctk.CTkLabel(form_frame, text="*Ano: \n(ex: 1605)", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
+        ano_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
+
+        ano_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=59, corner_radius=25, validate="key", validatecommand=(form_frame.register(lambda P: len(P) <= 4), "%P"))
+        ano_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
+
+        row_index += 1
+
+        quant_label = ctk.CTkLabel(form_frame, text="*Quantidade: \n(ex: 10)", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
+        quant_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
+
+        quant_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=53, corner_radius=25, validate="key", validatecommand=(form_frame.register(lambda P: len(P) <= 3), "%P"))
+        quant_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
+
+        row_index += 1
+
+        sinop_label = ctk.CTkLabel(form_frame, text="Sinopse:", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
+        sinop_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
+
+        sinop_entry = ctk.CTkTextbox(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, height=100, corner_radius=25)
+        sinop_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
+        sinop_entry._textbox.configure(padx=0, pady=0, spacing1=0, spacing2=0, spacing3=0)
+
+        row_index += 1
+
+        button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
+        button_frame.grid(row=row_index, column=1, columnspan=2, pady=(20, 10))
+
+        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=lambda: self.popup_book.destroy(), fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        cancel_button.grid(row=0, column=0, sticky="nsew", padx=10, pady=(0, 10))
+        cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
+        cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
+
+        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.add_book_to_db(book_entry, author_entry, genre_entry, ano_entry, editora_entry, quant_entry, sinop_entry), fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        confirm_button.grid(row=0, column=1, sticky="nsew", padx=10, pady=(0, 10))
+        confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
+        confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
+
     def show_users(self):
         self.clear_main_frame()
 
@@ -495,7 +591,7 @@ class DashboardApp(ctk.CTk):
         top_frame.grid(row=row_index, column=0, sticky="ew", padx=25, pady=(17, 15))
         top_frame.grid_columnconfigure(0, weight=0)
         top_frame.grid_columnconfigure(1, weight=1)
-        top_frame.grid_columnconfigure(2, weight=0)
+        top_frame.grid_columnconfigure((2, 3, 4), weight=0)
 
         title = ctk.CTkLabel(top_frame, text="USUÁRIOS", fg_color="transparent", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
         title.grid(row=0, column=0, sticky="w", padx=(0, 20))
@@ -513,95 +609,14 @@ class DashboardApp(ctk.CTk):
         filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
         filter_button.pack(side="right", padx=10)
 
+        self.remove_button = ctk.CTkButton(top_frame, text="❌", width=40, height=40, corner_radius=25, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, command=self.add_user)
+        self.remove_button.grid(row=0, column=2, sticky="e", padx=(25, 12))
+
+        self.edit_button = ctk.CTkButton(top_frame, text="✏", width=40, height=40, corner_radius=25, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, command=self.add_user)
+        self.edit_button.grid(row=0, column=3, sticky="e", padx=(0, 0))
+
         self.plus_button = ctk.CTkButton(top_frame, text="➕", width=40, height=40, corner_radius=25, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, command=self.add_user)
-        self.plus_button.grid(row=0, column=2, sticky="e", padx=(25, 0))
-
-        row_index += 1
-
-        self.table_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="transparent")
-        self.table_frame.grid(row=row_index, column=0, sticky="nsew", padx=25, pady=(0, 20))
-
-        self.general_filter()
-
-    def show_loans(self):
-        self.clear_main_frame()
-
-        self.main_frame.grid_columnconfigure(0, weight=1)
-        self.main_frame.grid_columnconfigure((1, 2, 3, 4), weight=0)
-        self.main_frame.grid_rowconfigure((0, 2, 3), weight=0)
-        self.main_frame.grid_rowconfigure(1, weight=1)
-
-        self.sort_column = "data"
-        self.sort_direction = "DESC"
-
-        row_index = 0
-
-        top_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        top_frame.grid(row=row_index, column=0, sticky="ew", padx=25, pady=(17, 15))
-        top_frame.grid_columnconfigure(0, weight=0)
-        top_frame.grid_columnconfigure(1, weight=1)
-        top_frame.grid_columnconfigure(2, weight=0)
-
-        title = ctk.CTkLabel(top_frame, text="EMPRÉSTIMOS", fg_color="transparent", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
-        title.grid(row=0, column=0, sticky="w", padx=(0, 20))
-
-        search_frame = ctk.CTkFrame(top_frame, fg_color=LIGHT_PURPLE_COLOR, corner_radius=25)
-        search_frame.grid(row=0, column=1, sticky="ew")
-
-        search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
-        search_icon.pack(side="left", padx=(10, 2))
-
-        self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: 15112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
-        self.search_entry.pack(side="left", expand=True, fill="x", ipady=5)
-        self.search_entry.bind("<Return>", self.general_filter)
-
-        filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
-        filter_button.pack(side="right", padx=10)
-
-        self.plus_button = ctk.CTkButton(top_frame, text="➕", width=40, height=40, corner_radius=25, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, command=self.make_loan)
-        self.plus_button.grid(row=0, column=2, sticky="e", padx=(25, 0))
-
-        row_index += 1
-
-        self.table_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="transparent")
-        self.table_frame.grid(row=row_index, column=0, sticky="nsew", padx=25, pady=(0, 20))
-
-        self.general_filter()
-
-    def show_returns(self):
-        self.clear_main_frame()
-
-        self.main_frame.grid_columnconfigure(0, weight=1)
-        self.main_frame.grid_columnconfigure((1, 2, 3, 4), weight=0)
-        self.main_frame.grid_rowconfigure((0, 2, 3), weight=0)
-        self.main_frame.grid_rowconfigure(1, weight=1)
-
-        self.sort_column = "nome"
-        self.sort_direction = "ASC"
-
-        row_index = 0
-
-        top_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        top_frame.grid(row=row_index, column=0, sticky="ew", padx=25, pady=(17.5, 15))
-        top_frame.grid_columnconfigure(0, weight=0)
-        top_frame.grid_columnconfigure(1, weight=1)
-        top_frame.grid_columnconfigure(2, weight=0)
-
-        title = ctk.CTkLabel(top_frame, text="DEVOLUÇÕES", fg_color="transparent", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
-        title.grid(row=0, column=0, sticky="w", padx=(0, 20))
-
-        search_frame = ctk.CTkFrame(top_frame, fg_color=LIGHT_PURPLE_COLOR, corner_radius=25)
-        search_frame.grid(row=0, column=1, sticky="ew",)
-
-        search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
-        search_icon.pack(side="left", padx=(10, 2))
-
-        self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: 25112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
-        self.search_entry.pack(side="left", expand=True, fill="x", ipady=5)
-        self.search_entry.bind("<Return>", self.general_filter)
-
-        filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
-        filter_button.pack(side="right", padx=10)
+        self.plus_button.grid(row=0, column=4, sticky="e", padx=(12, 0))
 
         row_index += 1
 
@@ -611,17 +626,19 @@ class DashboardApp(ctk.CTk):
         self.general_filter()
 
     def add_user(self):
-        self.clear_main_frame()
+        self.popup_user = ctk.CTkToplevel(self, fg_color="white")
+        self.popup_user.title("Adicionar Usuário")
+        self.popup_user.minsize(250, 0)
+        self.popup_user.resizable(False, False)
+        self.popup_user.transient(self)
+        self.popup_user.grab_set()
 
-        self.main_frame.grid_columnconfigure(0, weight=1)
-        self.main_frame.grid_columnconfigure((1, 2, 3, 4), weight=0)
-        self.main_frame.grid_rowconfigure((0, 2), weight=0)
-        self.main_frame.grid_rowconfigure((1, 3), weight=1)
+        self.popup_user.grid_columnconfigure(0, weight=1)
+        self.popup_user.grid_columnconfigure((1, 2, 3, 4), weight=0)
+        self.popup_user.grid_rowconfigure((0, 2), weight=0)
+        self.popup_user.grid_rowconfigure((1, 3), weight=1)
 
-        title = ctk.CTkLabel(self.main_frame, text="ADICIONAR USUÁRIO", fg_color="transparent", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
-        title.grid(row=0, column=0, sticky="w", padx=25, pady=(23, 15))
-
-        form_frame = ctk.CTkFrame(self.main_frame, fg_color="white")
+        form_frame = ctk.CTkFrame(self.popup_user, fg_color="white")
         form_frame.grid(row=2, column=0, sticky="n", padx=20, pady=10)
         form_frame.grid_columnconfigure(0, weight=0)
         form_frame.grid_columnconfigure(1, weight=1)
@@ -703,194 +720,75 @@ class DashboardApp(ctk.CTk):
         button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
         button_frame.grid(row=row_index, column=1, pady=(20, 10))
 
-        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=self.close_screen, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=lambda: self.popup_user.destroy(), fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         cancel_button.grid(row=0, column=0, sticky="nsew", padx=10, pady=(0, 10))
         cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
 
-        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.add_user_table(nome_entry, user_type, general_entry, room_entry, telefone_entry), fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.add_user_to_db(nome_entry, user_type, general_entry, room_entry, telefone_entry), fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         confirm_button.grid(row=0, column=1, sticky="nsew", padx=10, pady=(0, 10))
         confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
-    def add_user_table(self, e_nome, v_tipo, e_geral, e_sala, e_tel):
-        func = "usuarios"
-        nome = e_nome.get().strip()
-        tipo = v_tipo.get()
-        dado_geral = e_geral.get().strip()
-        sala = e_sala.get().strip()
-        telefone = e_tel.get().strip()
-
-        if not nome or not dado_geral:
-            messagebox.showerror("Erro", "Por favor, preencha os campos obrigatórios (*).")
-            return
-        
-        if tipo == "Aluno":
-            if not sala:
-                messagebox.showerror("Erro", "Para alunos, a série é obrigatória.")
-                return
-        else:
-            sala = None
-        
-        try:
-            cursor = Database.sql.cursor()
-
-            query = """
-                INSERT INTO tb_usuarios (nome, tipo, sala, email, telefone)
-                VALUES (%s, %s, %s, %s, %s)
-            """
-            values = (nome, tipo, sala, dado_geral, telefone)
-            
-            cursor.execute(query, values)
-            Database.sql.commit()
-            
-            self.confirm_add(func) 
-
-        except Exception as e:
-            messagebox.showerror("Erro no Banco de Dados", f"Não foi possível cadastrar o usuário.\nErro: {e}")
-
-    def add_book(self):
+    def show_loans(self):
         self.clear_main_frame()
 
         self.main_frame.grid_columnconfigure(0, weight=1)
         self.main_frame.grid_columnconfigure((1, 2, 3, 4), weight=0)
-        self.main_frame.grid_rowconfigure((0, 2), weight=0)
-        self.main_frame.grid_rowconfigure((1, 3), weight=1)
+        self.main_frame.grid_rowconfigure((0, 2, 3), weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
 
-        title = ctk.CTkLabel(self.main_frame, text="ADICIONAR LIVRO", fg_color="transparent", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
-        title.grid(row=0, column=0, sticky="w", padx=25, pady=(23, 15))
-
-        form_frame = ctk.CTkFrame(self.main_frame, fg_color="white")
-        form_frame.grid(row=2, column=0, sticky="n", padx=20, pady=10)
-        form_frame.grid_columnconfigure(0, weight=0)
-        form_frame.grid_columnconfigure(1, weight=1)
+        self.sort_column = "data"
+        self.sort_direction = "DESC"
 
         row_index = 0
 
-        obs_label = ctk.CTkLabel(form_frame, text="Os campos com * são obrigatórios", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
-        obs_label.grid(row=row_index, column=1, ipady=5)
+        top_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        top_frame.grid(row=row_index, column=0, sticky="ew", padx=25, pady=(17, 15))
+        top_frame.grid_columnconfigure(0, weight=0)
+        top_frame.grid_columnconfigure(1, weight=1)
+        top_frame.grid_columnconfigure(2, weight=0)
+
+        title = ctk.CTkLabel(top_frame, text="EMPRÉSTIMOS", fg_color="transparent", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
+        title.grid(row=0, column=0, sticky="w", padx=(0, 20))
+
+        search_frame = ctk.CTkFrame(top_frame, fg_color=LIGHT_PURPLE_COLOR, corner_radius=25)
+        search_frame.grid(row=0, column=1, sticky="ew")
+
+        search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
+        search_icon.pack(side="left", padx=(10, 2))
+
+        self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: 15112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
+        self.search_entry.pack(side="left", expand=True, fill="x", ipady=5)
+        self.search_entry.bind("<Return>", self.general_filter)
+
+        filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
+        filter_button.pack(side="right", padx=10)
+
+        self.plus_button = ctk.CTkButton(top_frame, text="➕", width=40, height=40, corner_radius=25, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, command=self.make_loan)
+        self.plus_button.grid(row=0, column=2, sticky="e", padx=(25, 0))
 
         row_index += 1
 
-        book_label = ctk.CTkLabel(form_frame, text="*Nome: \n(ex: Dom Quixote):", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
-        book_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5), ipady=5)
+        self.table_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="transparent")
+        self.table_frame.grid(row=row_index, column=0, sticky="nsew", padx=25, pady=(0, 20))
 
-        book_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
-        book_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
-
-        row_index += 1
-
-        author_label = ctk.CTkLabel(form_frame, text="*Autor \n(Miguel de Cervantes):", text_color="black", font=("Arial", 11, "bold"), anchor="w")
-        author_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
-
-        author_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
-        author_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
-
-        row_index += 1
-
-        genre_label = ctk.CTkLabel(form_frame, text="*Gênero \n(ex: Romance):", text_color="black", font=("Arial", 11, "bold"), anchor="w")
-        genre_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
-
-        genre_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
-        genre_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
-
-        row_index += 1
-
-        editora_label = ctk.CTkLabel(form_frame, text="*Editora \n(ex: Editora Garnier):", text_color="black", font=("Arial", 11, "bold"), anchor="w")
-        editora_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
-
-        editora_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
-        editora_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
-
-        row_index += 1
-
-        ano_label = ctk.CTkLabel(form_frame, text="*Ano: \n(ex: 1605)", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
-        ano_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
-
-        ano_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=59, corner_radius=25, validate="key", validatecommand=(form_frame.register(lambda P: len(P) <= 4), "%P"))
-        ano_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
-
-        row_index += 1
-
-        quant_label = ctk.CTkLabel(form_frame, text="*Quantidade: \n(ex: 10)", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
-        quant_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
-
-        quant_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=53, corner_radius=25, validate="key", validatecommand=(form_frame.register(lambda P: len(P) <= 3), "%P"))
-        quant_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
-
-        row_index += 1
-
-        sinop_label = ctk.CTkLabel(form_frame, text="Sinopse:", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
-        sinop_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
-
-        sinop_entry = ctk.CTkTextbox(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, height=100, corner_radius=25)
-        sinop_entry.grid(row=row_index, column=1, pady=(10, 5), ipady=5)
-        sinop_entry._textbox.configure(padx=0, pady=0, spacing1=0, spacing2=0, spacing3=0)
-
-        row_index += 1
-
-        button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
-        button_frame.grid(row=row_index, column=1, columnspan=2, pady=(20, 10))
-
-        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=self.close_screen, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
-        cancel_button.grid(row=0, column=0, sticky="nsew", padx=10, pady=(0, 10))
-        cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
-        cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
-
-        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.add_book_table(book_entry, author_entry, genre_entry, ano_entry, editora_entry, quant_entry, sinop_entry), fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
-        confirm_button.grid(row=0, column=1, sticky="nsew", padx=10, pady=(0, 10))
-        confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
-        confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
-    
-    def add_book_table(self, e_livro, e_autor, e_genero, e_ano, e_editora, e_quant, e_sinopse):
-        func = "livros"
-        livro = e_livro.get().strip()
-        autor = e_autor.get().strip()
-        genero = e_genero.get().strip()
-        ano = e_ano.get().strip()
-        editora = e_editora.get().strip()
-        quantidade = e_quant.get().strip()
-        sinopse = e_sinopse.get("0.0", "end").strip()
-
-        if not livro or not autor or not genero or not ano or not editora or not quantidade:
-            messagebox.showerror("Erro", "Por favor, preencha os campos obrigatórios (*).")
-            return
-        
-        try:
-            ano_int = int(ano)
-            quant_int = int(quantidade)
-        except ValueError:
-            messagebox.showerror("Erro", "Ano e Quantidade devem ser números válidos.")
-            return
-        
-        try:
-            cursor = Database.sql.cursor()
-            query = """
-                INSERT INTO tb_livros (livro, autor, genero, ano, editora, quantidade, sinopse)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """
-            values = (livro, autor, genero, ano_int, editora, quant_int, sinopse)
-            
-            cursor.execute(query, values)
-            Database.sql.commit()
-            
-            self.confirm_add(func)
-
-        except Exception as e:
-            messagebox.showerror("Erro no Banco de Dados", f"Não foi possível cadastrar o livro.\nErro: {e}")
+        self.general_filter()
 
     def make_loan(self):
-        self.clear_main_frame()
+        self.popup_loan = ctk.CTkToplevel(self, fg_color="white")
+        self.popup_loan.title("Realizar Empréstimo")
+        self.popup_loan.minsize(250, 0)
+        self.popup_loan.resizable(False, False)
+        self.popup_loan.transient(self)
+        self.popup_loan.grab_set()
 
-        self.main_frame.grid_columnconfigure(0, weight=1)
-        self.main_frame.grid_columnconfigure((1, 2, 3, 4), weight=0)
-        self.main_frame.grid_rowconfigure((0, 2), weight=0)
-        self.main_frame.grid_rowconfigure((1, 3), weight=1)
+        self.popup_loan.grid_columnconfigure(0, weight=1)
+        self.popup_loan.grid_columnconfigure((1, 2, 3, 4), weight=0)
+        self.popup_loan.grid_rowconfigure((0, 2), weight=0)
+        self.popup_loan.grid_rowconfigure((1, 3), weight=1)
 
-        title = ctk.CTkLabel(self.main_frame, text="FAZER EMPRÉSTIMO", fg_color="transparent", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
-        title.grid(row=0, column=0, sticky="w", padx=25, pady=(23, 15))
-
-        form_frame = ctk.CTkFrame(self.main_frame, fg_color="white")
+        form_frame = ctk.CTkFrame(self.popup_loan, fg_color="white")
         form_frame.grid(row=2, column=0, sticky="n", padx=20, pady=10)
         form_frame.grid_columnconfigure(0, weight=0)
         form_frame.grid_columnconfigure(1, weight=1)
@@ -998,20 +896,130 @@ class DashboardApp(ctk.CTk):
         button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
         button_frame.grid(row=row_index, column=1, columnspan=2, pady=(20, 10))
 
-        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=self.close_screen, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        cancel_button = ctk.CTkButton(button_frame, text="Cancelar", command=lambda: self.popup_loan.destroy(), fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         cancel_button.grid(row=0, column=0, sticky="nsew", padx=10, pady=(0, 10))
         cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
 
-        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.add_loan_table(nome_entry, user_type, general_entry, book_entry, quant_entry, date_entry, due_entry), fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.make_loan_to_db(nome_entry, user_type, general_entry, book_entry, quant_entry, date_entry, due_entry), fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         confirm_button.grid(row=0, column=1, sticky="nsew", padx=10, pady=(0, 10))
         confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
-    def add_loan_table(self, e_nome, v_tipo, e_geral, e_livro, e_quant, e_data, e_prazo):
-        from datetime import datetime
+    def show_returns(self):
+        self.clear_main_frame()
 
-        func = "emprestimos"
+        self.main_frame.grid_columnconfigure(0, weight=1)
+        self.main_frame.grid_columnconfigure((1, 2, 3, 4), weight=0)
+        self.main_frame.grid_rowconfigure((0, 2, 3), weight=0)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+
+        self.sort_column = "nome"
+        self.sort_direction = "ASC"
+
+        row_index = 0
+
+        top_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        top_frame.grid(row=row_index, column=0, sticky="ew", padx=25, pady=(17.5, 15))
+        top_frame.grid_columnconfigure(0, weight=0)
+        top_frame.grid_columnconfigure(1, weight=1)
+        top_frame.grid_columnconfigure(2, weight=0)
+
+        title = ctk.CTkLabel(top_frame, text="DEVOLUÇÕES", fg_color="transparent", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
+        title.grid(row=0, column=0, sticky="w", padx=(0, 20))
+
+        search_frame = ctk.CTkFrame(top_frame, fg_color=LIGHT_PURPLE_COLOR, corner_radius=25)
+        search_frame.grid(row=0, column=1, sticky="ew",)
+
+        search_icon = ctk.CTkLabel(search_frame, text="🔍", text_color="gray", font=("Arial", 16))
+        search_icon.pack(side="left", padx=(10, 2))
+
+        self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Buscar... (ex: 25112025)", border_width=0, fg_color="transparent", text_color=TEXT_COLOR_BLACK, height=30)
+        self.search_entry.pack(side="left", expand=True, fill="x", ipady=5)
+        self.search_entry.bind("<Return>", self.general_filter)
+
+        filter_button = ctk.CTkButton(search_frame, text="⏷", fg_color="transparent", hover_color=DARK_PURPLE_COLOR, text_color="gray", width=10, font=("Arial", 16), command=None)
+        filter_button.pack(side="right", padx=10)
+
+        row_index += 1
+
+        self.table_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color="transparent")
+        self.table_frame.grid(row=row_index, column=0, sticky="nsew", padx=25, pady=(0, 20))
+
+        self.general_filter()
+
+    def add_book_to_db(self, e_livro, e_autor, e_genero, e_ano, e_editora, e_quant, e_sinopse):
+        livro = e_livro.get().strip()
+        autor = e_autor.get().strip()
+        genero = e_genero.get().strip()
+        ano = e_ano.get().strip()
+        editora = e_editora.get().strip()
+        quantidade = e_quant.get().strip()
+        sinopse = e_sinopse.get("0.0", "end").strip()
+
+        if not livro or not autor or not genero or not ano or not editora or not quantidade:
+            messagebox.showerror("Erro", "Por favor, preencha os campos obrigatórios (*).")
+            return
+        
+        try:
+            ano_int = int(ano)
+            quant_int = int(quantidade)
+        except ValueError:
+            messagebox.showerror("Erro", "Ano e Quantidade devem ser números válidos.")
+            return
+        
+        try:
+            cursor = Database.sql.cursor()
+            query = """
+                INSERT INTO tb_livros (livro, autor, genero, ano, editora, quantidade, sinopse)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            values = (livro, autor, genero, ano_int, editora, quant_int, sinopse)
+            
+            cursor.execute(query, values)
+            Database.sql.commit()
+            
+            self.confirm_add("books")
+
+        except Exception as e:
+            messagebox.showerror("Erro no Banco de Dados", f"Não foi possível cadastrar o livro.\nErro: {e}")
+
+    def add_user_to_db(self, e_nome, v_tipo, e_geral, e_sala, e_tel):
+        nome = e_nome.get().strip()
+        tipo = v_tipo.get()
+        dado_geral = e_geral.get().strip()
+        sala = e_sala.get().strip()
+        telefone = e_tel.get().strip()
+
+        if not nome or not dado_geral:
+            messagebox.showerror("Erro", "Por favor, preencha os campos obrigatórios (*).")
+            return
+        
+        if tipo == "Aluno":
+            if not sala:
+                messagebox.showerror("Erro", "Para alunos, a série é obrigatória.")
+                return
+        else:
+            sala = None
+        
+        try:
+            cursor = Database.sql.cursor()
+
+            query = """
+                INSERT INTO tb_usuarios (nome, tipo, sala, email, telefone)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            values = (nome, tipo, sala, dado_geral, telefone)
+            
+            cursor.execute(query, values)
+            Database.sql.commit()
+            
+            self.confirm_add("users") 
+
+        except Exception as e:
+            messagebox.showerror("Erro no Banco de Dados", f"Não foi possível cadastrar o usuário.\nErro: {e}")
+
+    def make_loan_to_db(self, e_nome, v_tipo, e_geral, e_livro, e_quant, e_data, e_prazo):
         nome = e_nome.get().strip()
         tipo_selecionado = v_tipo.get()
         dado_geral = e_geral.get().strip()
@@ -1090,7 +1098,7 @@ class DashboardApp(ctk.CTk):
 
             Database.sql.commit()
 
-            self.confirm_add(func)
+            self.confirm_add("loans")
 
         except Exception as e:
             Database.sql.rollback()
@@ -1146,7 +1154,7 @@ class DashboardApp(ctk.CTk):
 
         except Exception as e:
             print(e)
-    
+
     def close_screen(self):
         match self.active_button_name:
             case "USUÁRIOS":
@@ -1185,7 +1193,15 @@ class DashboardApp(ctk.CTk):
 
         def confirm_and_close():
             popup.destroy()
-            self.close_screen()
+            if func == "books":
+                self.popup_book.destroy()
+                self.close_screen()
+            if func == "users":
+                self.popup_user.destroy()
+                self.close_screen()
+            if func == "loans":
+                self.popup_loan.destroy()
+                self.close_screen()
 
         cancel_button = ctk.CTkButton(content_frame, text="Não", command=confirm_and_close, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
         cancel_button.grid(row=2, column=0, padx=10, pady=(0, 25), sticky="e")
@@ -1194,12 +1210,14 @@ class DashboardApp(ctk.CTk):
 
         def confirm_and_reopen():
             popup.destroy()
-            self.clear_main_frame()
-            if func == "livros":
+            if func == "books":
+                self.popup_book.destroy()
                 self.add_book()
-            if func == "usuarios":
+            if func == "users":
+                self.popup_user.destroy()
                 self.add_user()
-            if func == "emprestimos":
+            if func == "loans":
+                self.popup_loan.destroy()
                 self.make_loan()
             
         confirm_button = ctk.CTkButton(content_frame, text="Sim", command=confirm_and_reopen, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
@@ -1314,4 +1332,5 @@ class DashboardLogin(ctk.CTk):
 
         self.mainloop()
 
-DashboardLogin()
+app = DashboardApp(login_window=None)
+app.mainloop()
