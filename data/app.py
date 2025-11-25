@@ -30,7 +30,6 @@ class DashboardApp(ctk.CTk):
     def __init__(self, login_window):
         super().__init__()
         
-
         self.login_window = login_window
         self.title("Sistema Biblioteca")
         self.geometry("1280x720")
@@ -52,10 +51,12 @@ class DashboardApp(ctk.CTk):
         directory_app = os.path.dirname(os.path.abspath(__file__))
         self.json_config = os.path.join(directory_app, "config.json")
 
-        self.maxaluno = None
-        self.maxprofessor = None
-        self.datadev = None
+        self.maxaluno = 3
+        self.maxprofessor = 30
+        self.datadev = 15
         self.load_info()
+
+        self.date_today = datetime.now()
 
         self.setup()
 
@@ -251,7 +252,7 @@ class DashboardApp(ctk.CTk):
         aluno_max_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=45, corner_radius=25, validate="key", validatecommand=(form_frame.register(lambda P: len(P) <= 2), "%P"))
         aluno_max_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
 
-        valor_aluno = str(self.maxaluno) if self.maxaluno is not None else ""
+        valor_aluno = str(self.maxaluno) if self.maxaluno is not None else 3
         aluno_max_entry.insert(0, valor_aluno)
 
         row_index += 1
@@ -262,7 +263,7 @@ class DashboardApp(ctk.CTk):
         prof_max_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=45, corner_radius=25, validate="key", validatecommand=(form_frame.register(lambda P: len(P) <= 2), "%P"))
         prof_max_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
 
-        valor_prof = str(self.maxprofessor) if self.maxprofessor is not None else ""
+        valor_prof = str(self.maxprofessor) if self.maxprofessor is not None else 30
         prof_max_entry.insert(0, valor_prof)
 
         row_index += 1
@@ -273,7 +274,7 @@ class DashboardApp(ctk.CTk):
         due_max_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=45, corner_radius=25, validate="key", validatecommand=(form_frame.register(lambda P: len(P) <= 2), "%P"))
         due_max_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
 
-        valor_due = str(self.datadev) if self.datadev is not None else ""
+        valor_due = str(self.datadev) if self.datadev is not None else 15
         due_max_entry.insert(0, valor_due)
 
         row_index += 1
@@ -410,7 +411,7 @@ class DashboardApp(ctk.CTk):
 
         if self.active_button_name == "EMPRÉSTIMOS":
             try:
-                hoje = datetime.now().strftime("%Y-%m-%d")
+                hoje = self.date_today.strftime("%Y-%m-%d")
                 
                 query_update = "UPDATE tb_emprestimos SET status = 'Atrasado' WHERE status = 'Pendente' AND prazo < %s"
                 
@@ -620,7 +621,7 @@ class DashboardApp(ctk.CTk):
 
         row_index += 1
 
-        book_label = ctk.CTkLabel(form_frame, text="*Nome: \n(ex: Dom Quixote):", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
+        book_label = ctk.CTkLabel(form_frame, text="*Título: \n(ex: Dom Quixote):", text_color=TEXT_COLOR_BLACK, font=("Arial", 11, "bold"), anchor="w")
         book_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5), ipady=5)
 
         book_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
@@ -1054,11 +1055,19 @@ class DashboardApp(ctk.CTk):
 
         row_index += 1        
 
-        book_label = ctk.CTkLabel(form_frame, text="*Nome do Livro: \n(ex: Dom Quixote)", text_color="black", font=("Arial", 11, "bold"), anchor="w")
+        book_label = ctk.CTkLabel(form_frame, text="*Título do Livro: \n(ex: Dom Quixote)", text_color="black", font=("Arial", 11, "bold"), anchor="w")
         book_label.grid(row=row_index, column=0, padx=(0, 20), pady=(10, 5))
 
-        book_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
-        book_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
+        book_container = ctk.CTkFrame(form_frame, fg_color="transparent")
+        book_container.grid(row=row_index, column=1, pady=(10, 5))
+
+        book_entry = ctk.CTkEntry(book_container, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
+        book_entry.pack(side="left", pady=(10, 5), ipady=5)
+
+        btn_search_book = ctk.CTkButton(book_container, text="Buscar", width=50, corner_radius=25, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, command=lambda: self.loan_add_book_data(book_entry, autor_entry, ano_entry, editora_entry))
+        btn_search_book.pack(side="left", padx=(10, 0), pady=(10, 5), ipady=5)
+        btn_search_book.bind("<Enter>", lambda e: btn_search_book.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
+        btn_search_book.bind("<Leave>", lambda e: btn_search_book.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
         row_index += 1
 
@@ -1099,6 +1108,11 @@ class DashboardApp(ctk.CTk):
 
         date_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=87, corner_radius=25)
         date_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
+
+        date_entry_today = self.date_today.strftime("%d%m%Y")
+        date_entry.delete(0, "end")
+        date_entry.insert(0, date_entry_today)
+        date_entry.configure(state="disabled")
     
         row_index += 1
 
@@ -1107,6 +1121,12 @@ class DashboardApp(ctk.CTk):
 
         due_entry = ctk.CTkEntry(form_frame, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=87, corner_radius=25, validate="key", validatecommand=(form_frame.register(lambda P: len(P) <= 8), "%P"))
         due_entry.grid(row=row_index, column=1, sticky="w", pady=(10, 5), ipady=5)
+
+        due_entry_past = self.date_today + timedelta(days=self.datadev)
+        due_entry_future = due_entry_past.strftime("%d%m%Y") 
+        due_entry.delete(0, "end")
+        due_entry.insert(0, due_entry_future)
+        due_entry.configure(state="disabled")
 
         row_index += 1
 
@@ -1705,11 +1725,13 @@ class DashboardLogin(ctk.CTk):
         user_label.pack(fill="x", padx=30)
         user_entry = ctk.CTkEntry(frame, corner_radius=25, fg_color="#f0f0f0", border_width=0, text_color=TEXT_COLOR_BLACK, font=("Arial", 11))
         user_entry.pack(fill="x", padx=30, pady=(0, 10), ipady=5)
+        user_entry.bind("<Return>", lambda e: login())
 
         word_label = ctk.CTkLabel(frame, text="Senha", text_color="gray", anchor="w")
         word_label.pack(fill="x", padx=30)
         word_entry = ctk.CTkEntry(frame, corner_radius=25, fg_color="#f0f0f0", border_width=0, text_color=TEXT_COLOR_BLACK, font=("Arial", 11), show="*")
         word_entry.pack(fill="x", padx=30, pady=(0, 15), ipady=5)
+        word_entry.bind("<Return>", lambda e: login())
 
         def error(wrong):
             error = ctk.CTkToplevel(self, fg_color=BLUE_COLOR)
@@ -1730,16 +1752,10 @@ class DashboardLogin(ctk.CTk):
                 error.destroy()
 
             if wrong == 1:
-                error_title = ctk.CTkLabel(content_frame, text="Usuário incorreto.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
+                error_title = ctk.CTkLabel(content_frame, text="Usuário ou senha incorretos.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
                 error_title.grid(row=0, column=0, pady=(17, 5), padx=15)
             elif wrong == 2:
-                error_title = ctk.CTkLabel(content_frame, text="Senha incorreta.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
-                error_title.grid(row=0, column=0, pady=(17, 5), padx=15)
-            elif wrong == 3:
                 error_title = ctk.CTkLabel(content_frame, text="Preencha os campos obrigatórios.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
-                error_title.grid(row=0, column=0, pady=(17, 5), padx=15)
-            elif wrong == 4:
-                error_title = ctk.CTkLabel(content_frame, text="Usuário e senha incorretos.", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
                 error_title.grid(row=0, column=0, pady=(17, 5), padx=15)
 
             try_again = ctk.CTkButton(content_frame, text="Tentar novamente", fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, corner_radius=25, text_color=TEXT_COLOR_WHITE, command=close_error)
@@ -1762,19 +1778,13 @@ class DashboardLogin(ctk.CTk):
                 self.withdraw()
                 dashboard_app = DashboardApp(login_window=self)
                 dashboard_app.mainloop()
-            elif user != right[user] and password == right[password]:
-                wrong = 1
-                error(wrong)
-            elif user == right[user] and password != right[password]:
+            elif user == "" or password == "":
                 wrong = 2
                 error(wrong)
-            elif user == "" or password == "":
-                wrong = 3
+            elif user != right[user] or password != right[password]:
+                wrong = 1
                 error(wrong)
-            else:
-                wrong = 4
-                error(wrong)
-
+            
         enter_button = ctk.CTkButton(frame, text="Entrar", command=login, corner_radius=25, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, text_color=TEXT_COLOR_WHITE, font=("Arial", 12, "bold"))
         enter_button.pack(pady=(5, 10), ipadx=10, ipady=5)
 
@@ -1783,5 +1793,4 @@ class DashboardLogin(ctk.CTk):
 
         self.mainloop()
 
-app = DashboardApp(login_window=None)
-app.mainloop()
+DashboardLogin()
