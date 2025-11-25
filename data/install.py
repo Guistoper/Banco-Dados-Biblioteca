@@ -44,7 +44,7 @@ class Install:
                 print("Starting install...")
                 Install.__run_scripts(directory="Banco-Dados-Biblioteca/scripts")
                 Install.__sql.commit()
-                print("Scripts runned sucessfully!")
+                print("Scripts ran successfully!")
                 print("Stopping install...")          
                 return database
         except mysql.connector.Error as err:
