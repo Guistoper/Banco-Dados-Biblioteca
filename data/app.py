@@ -737,7 +737,6 @@ class DashboardApp(ctk.CTk):
             self.confirm_button("books", query, values)
 
         except Exception as e:
-            Database.sql.rollback()
             messagebox.showerror("Erro no Banco de Dados", f"Não foi possível cadastrar o livro.\nErro: {e}")
 
     def show_users(self):
@@ -926,7 +925,6 @@ class DashboardApp(ctk.CTk):
             self.confirm_button("users", query, values) 
 
         except Exception as e:
-            Database.sql.rollback()
             messagebox.showerror("Erro no Banco de Dados", f"Não foi possível cadastrar o usuário.\nErro: {e}")
 
     def show_loans(self):
@@ -1072,9 +1070,9 @@ class DashboardApp(ctk.CTk):
 
         book_entry = ctk.CTkEntry(book_container, fg_color="#f0f0f0", text_color=TEXT_COLOR_BLACK, border_width=0, width=300, corner_radius=25)
         book_entry.pack(side="left", pady=(10, 5), ipady=5)
-        book_entry.bind("<Return>", lambda e: None)
+        book_entry.bind("<Return>", lambda e: self.add_search_book_data(book_entry, autor_entry, ano_entry, editora_entry))
 
-        btn_search_book = ctk.CTkButton(book_container, text="Buscar", width=50, corner_radius=25, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, command=None)
+        btn_search_book = ctk.CTkButton(book_container, text="Buscar", width=50, corner_radius=25, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, command=lambda: self.add_search_book_data(book_entry, autor_entry, ano_entry, editora_entry))
         btn_search_book.pack(side="left", padx=(10, 0), pady=(10, 5), ipady=5)
         btn_search_book.bind("<Enter>", lambda e: btn_search_book.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         btn_search_book.bind("<Leave>", lambda e: btn_search_book.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
@@ -1220,11 +1218,11 @@ class DashboardApp(ctk.CTk):
             """
             values = (id_usa, id_liv, quant_int, data_fmt, prazo_fmt, "Pendente")
             query_update_stock = "UPDATE tb_livros SET quantidade = quantidade - %s WHERE id_liv = %s"
+            values_update = (quant_int, id_liv)
 
-            self.confirm_button_add_loan(query_insert, values, query_update_stock)
+            self.confirm_button_add_loan(query_insert, values, query_update_stock, values_update)
 
         except Exception as e:
-            Database.sql.rollback()
             messagebox.showerror("Erro no Banco", f"Falha ao realizar empréstimo: {e}")
 
     def add_search_user_data(self, nome_entry, user_type, general_entry, func_toggle):
@@ -1310,6 +1308,84 @@ class DashboardApp(ctk.CTk):
 
         self.aluno_button.configure(state="disabled")
         self.professor_button.configure(state="disabled")
+
+    def add_search_book_data(self, book_entry, autor_entry, ano_entry, editora_entry):
+        livro_busca = book_entry.get().strip()
+        
+        if not livro_busca:
+            return
+
+        try:
+            cursor = Database.sql.cursor()
+            sql_parts = []
+            params = []
+
+            if livro_busca:
+                sql_parts.append("livro LIKE %s")
+                params.append(f"%{livro_busca}%")
+
+            if not sql_parts: return
+            
+            query_conditions = " AND ".join(sql_parts)
+
+            query = f"SELECT livro, autor, ano, editora FROM tb_livros WHERE {query_conditions}"
+            cursor.execute(query, tuple(params))
+            results = cursor.fetchall()
+
+            if not results:
+                messagebox.showinfo("Busca", "Livro não encontrado.")
+            
+            elif len(results) == 1:
+                self.add_fill_book_fields(results[0], book_entry, autor_entry, ano_entry, editora_entry)
+            
+            else:
+                self.add_show_book_selection(results, book_entry, autor_entry, ano_entry, editora_entry)
+        
+        except Exception as e:
+            print(f"Erro na busca de livro: {e}")
+
+    def add_show_book_selection(self, books_list, book_entry, autor_entry, ano_entry, editora_entry):
+        selection_popup = ctk.CTkToplevel(self, fg_color="white")
+        selection_popup.title("Selecionar Livro")
+        selection_popup.geometry("600x350")
+        selection_popup.resizable(False, False)
+        selection_popup.transient(self.popup_loan)
+        selection_popup.grab_set()
+        
+        if hasattr(self, 'popup_loan') and self.popup_loan.winfo_exists():
+            selection_popup.transient(self.popup_loan)
+        else:
+            selection_popup.transient(self)
+        
+        selection_popup.grab_set()
+
+        title = ctk.CTkLabel(selection_popup, text="Múltiplos livros encontrados.\nSelecione um:", text_color=TEXT_COLOR_BLACK, font=("Arial", 16, "bold"))
+        title.pack(pady=10)
+
+        scroll_frame = ctk.CTkScrollableFrame(selection_popup, width=600, height=350)
+        scroll_frame.pack(padx=10, pady=(0, 10), fill="both", expand=True)
+
+        for book in books_list:
+            b_titulo, b_autor, b_ano, b_editora = book
+
+            btn_text = f"{b_titulo} | {b_autor} | {b_ano} | {b_editora}"
+
+            btn = ctk.CTkButton(scroll_frame, text=btn_text, fg_color=BLUE_COLOR, anchor="w", height=40,command=lambda b=book, p=selection_popup: self.add_select_book_and_close(b, p, book_entry, autor_entry, ano_entry, editora_entry))
+            btn.pack(pady=5, padx=5, fill="x")
+
+    def add_select_book_and_close(self, book_data, popup, *args):
+        popup.destroy()
+        self.add_fill_book_fields(book_data, *args)
+
+    def add_fill_book_fields(self, book_data, book_entry, autor_entry, ano_entry, editora_entry):
+        titulo_found, autor_found, ano_found, editora_found = book_data
+
+        book_entry.delete(0, "end")
+        book_entry.insert(0, titulo_found)
+
+        self.update_disabled_entry(autor_entry, autor_found)
+        self.update_disabled_entry(ano_entry, ano_found)
+        self.update_disabled_entry(editora_entry, editora_found)
 
     def edit_loan(self):
         self.popup_loan = ctk.CTkToplevel(self, fg_color="white")
@@ -1506,19 +1582,22 @@ class DashboardApp(ctk.CTk):
             dt_emprestimo = datetime.strptime(nova_data, "%d%m%Y").strftime("%Y-%m-%d")
             dt_devolucao = datetime.strptime(novo_prazo, "%d%m%Y").strftime("%Y-%m-%d")
 
-            query = """
+            query_update = """
                 UPDATE tb_emprestimos 
                 SET quantidade = %s, data = %s, prazo = %s, status = %s 
                 WHERE id_emp = %s
             """
             values = (nova_quant, dt_emprestimo, dt_devolucao, novo_status, self.current_loan_id)
-            
-            self.confirm_button("loans", query, values)
+
+            if novo_status == "Devolvido":
+                query_stock = "UPDATE tb_livros SET quantidade = quantidade + %s WHERE id_liv = %s"
+                values_stock = (self.current_loan_quant, self.current_book_id)
+
+            self.confirm_button_edit_loan(query_update, values, query_stock, values_stock)
 
         except ValueError:
             messagebox.showerror("Erro", "Formato de data inválido. Use apenas números (DDMMAAAA).")
         except Exception as e:
-            Database.sql.rollback()
             messagebox.showerror("Erro", f"Erro ao atualizar o banco de dados: {e}")
 
     def edit_search_loan_data(self, nome_entry, user_type, general_entry, func_toggle, book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry, status_type):
@@ -1548,7 +1627,7 @@ class DashboardApp(ctk.CTk):
     def edit_show_user_selection(self, users_list, *args):
         selection_popup = ctk.CTkToplevel(self, fg_color="white")
         selection_popup.title("Selecionar Usuário")
-        selection_popup.geometry("600x350")
+        selection_popup.geometry("650x350")
         selection_popup.resizable(False, False)
         selection_popup.transient(self.popup_loan)
         selection_popup.grab_set()
@@ -1837,74 +1916,26 @@ class DashboardApp(ctk.CTk):
         cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
 
-        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=None, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
+        confirm_button = ctk.CTkButton(button_frame, text="Confirmar", command=lambda: self.make_delete_loan_to_db(), fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=75)
         confirm_button.grid(row=0, column=1, sticky="nsew", padx=10, pady=(0, 10))
         confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
         confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
-    def delete_search_loan_data(self, nome_entry, user_type, general_entry, func_toggle, book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry):
-        nome_busca = nome_entry.get().strip()
-        
-        if not nome_busca:
+    def make_delete_loan_to_db(self):
+        if not hasattr(self, 'current_loan_id') or self.current_loan_id is None:
+            messagebox.showerror("Erro", "Nenhum empréstimo selecionado.")
             return
-
-        try:
-            cursor = Database.sql.cursor()
-            sql_parts = []
-            params = []
-
-            if nome_busca:
-                sql_parts.append("nome LIKE %s")
-                params.append(f"%{nome_busca}%")
-
-            if not sql_parts: return
-            
-            query_conditions = " AND ".join(sql_parts)
-
-            query = f"SELECT id_usa, nome, tipo, email FROM tb_usuarios WHERE {query_conditions} LIMIT 1"
-            cursor.execute(query, tuple(params))
-            result = cursor.fetchone()
-
-            if result:
-                id_usa, nome, tipo, email = result
-
-                nome_entry.delete(0, "end")
-                nome_entry.insert(0, nome)
-
-                self.aluno_button.configure(state="normal")
-                self.professor_button.configure(state="normal")
-
-                user_type.set(tipo)
-                func_toggle()
-
-                self.aluno_button.configure(state="disabled")
-                self.professor_button.configure(state="disabled")
-
-                self.update_disabled_entry(general_entry, email)
-
-                query_emp = f"""
-                    SELECT E.id_liv, E.quantidade, E.data, E.prazo, L.livro, L.autor, L.ano, L.editora 
-                    FROM tb_emprestimos E
-                    JOIN tb_livros L ON E.id_liv = L.id_liv
-                    WHERE E.id_usa = {id_usa}
-                """
-                cursor.execute(query_emp)
-                loans_result = cursor.fetchall()
-
-                if not loans_result:
-                    messagebox.showinfo("Info", "Este usuário não possui empréstimos ativos.")
-                
-                elif len(loans_result) == 1:
-                    self.delete_fill_loan_fields(loans_result[0], book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry)
-                
-                else:
-                    self.delete_show_loan_selection(loans_result, book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry)
-                
-            else:
-                messagebox.showinfo("Busca", "Usuário não encontrado.")
         
+        try:
+            query_action = "DELETE FROM tb_emprestimos WHERE id_emp = %s"
+            values = (self.current_loan_id, )
+            query_stock = "UPDATE tb_livros SET quantidade = quantidade + %s WHERE id_liv = %s"
+            values_stock = (self.current_loan_quant, self.current_book_id)
+
+            self.confirm_button_edit_loan(query_action, values, query_stock, values_stock)
+
         except Exception as e:
-            print(f"Erro na busca: {e}")
+            messagebox.showerror("Erro", f"Falha ao realizar devolução: {e}")
 
     def delete_search_loan_data(self, nome_entry, user_type, general_entry, func_toggle, book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry):
         nome_busca = nome_entry.get().strip()
@@ -1933,9 +1964,14 @@ class DashboardApp(ctk.CTk):
     def delete_show_user_selection(self, users_list, *args):
         selection_popup = ctk.CTkToplevel(self, fg_color="white")
         selection_popup.title("Selecionar Usuário")
-        selection_popup.geometry("600x350")
+        selection_popup.geometry("650x350")
         selection_popup.resizable(False, False)
-        selection_popup.transient(self.popup_loan)
+
+        if hasattr(self, 'popup_loan') and self.popup_loan.winfo_exists():
+            selection_popup.transient(self.popup_loan)
+        else:
+            selection_popup.transient(self)
+            
         selection_popup.grab_set()
 
         title = ctk.CTkLabel(selection_popup, text="Múltiplos usuários encontrados.\nSelecione um:", text_color=TEXT_COLOR_BLACK, font=("Arial", 16, "bold"))
@@ -1946,13 +1982,12 @@ class DashboardApp(ctk.CTk):
 
         for user in users_list:
             id_usa, u_nome, u_tipo, u_dado = user
-
             label_dado = "RA" if u_tipo == "Aluno" else "Email"
             btn_text = f"{u_nome} | {u_tipo} | {label_dado}: {u_dado}"
             
-            btn = ctk.CTkButton(scroll_frame, text=btn_text, fg_color=BLUE_COLOR, anchor="w", height=40,command=lambda u=user, p=selection_popup: [p.destroy(), self.continue_delete_with_user(u, *args)])
+            btn = ctk.CTkButton(scroll_frame, text=btn_text, fg_color=BLUE_COLOR, anchor="w", height=40, command=lambda u=user, p=selection_popup: [p.destroy(), self.continue_delete_with_user(u, *args)])
             btn.pack(pady=5, padx=5, fill="x")
-
+    
     def continue_delete_with_user(self, user_result, nome_entry, user_type, general_entry, func_toggle, book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry):
         try:
             id_usa, nome, tipo, email = user_result
@@ -1973,16 +2008,17 @@ class DashboardApp(ctk.CTk):
 
             cursor = Database.sql.cursor()
             query_emp = f"""
-                SELECT E.id_liv, E.quantidade, E.data, E.prazo, L.livro, L.autor, L.ano, L.editora
+                SELECT E.id_emp, E.id_liv, E.quantidade, E.data, E.prazo, L.livro, L.autor, L.ano, L.editora, E.status
                 FROM tb_emprestimos E
                 JOIN tb_livros L ON E.id_liv = L.id_liv
                 WHERE E.id_usa = {id_usa}
+                AND E.status IN ('Pendente', 'Atrasado')
             """
             cursor.execute(query_emp)
             loans_result = cursor.fetchall()
 
             if not loans_result:
-                messagebox.showinfo("Info", "Este usuário não possui empréstimos ativos.")
+                messagebox.showinfo("Info", "Este usuário não possui empréstimos pendentes.")
             
             elif len(loans_result) == 1:
                 self.delete_fill_loan_fields(loans_result[0], book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry)
@@ -2000,20 +2036,28 @@ class DashboardApp(ctk.CTk):
         selection_popup.resizable(False, False)
         selection_popup.transient(self.popup_loan)
         selection_popup.grab_set()
+        
+        if hasattr(self, 'popup_loan') and self.popup_loan.winfo_exists():
+            selection_popup.transient(self.popup_loan)
+        else:
+            selection_popup.transient(self)
 
-        title = ctk.CTkLabel(selection_popup, text="Múltiplos empréstimos encontrados.\nSelecione um:", text_color=TEXT_COLOR_BLACK, font=("Arial", 16, "bold"))
+        title = ctk.CTkLabel(selection_popup, text="Múltiplos empréstimos encontrados.\nSelecione um para devolução:", text_color=TEXT_COLOR_BLACK, font=("Arial", 16, "bold"))
         title.pack(pady=10)
 
         scroll_frame = ctk.CTkScrollableFrame(selection_popup, width=750, height=350)
         scroll_frame.pack(padx=10, pady=(0, 10), fill="both", expand=True)
 
+        loans_found = False
+
         for loan in loans_list:
-            livro_nome = loan[4]
-            autor_nome = loan[5]
-            ano_nome = loan[6]
-            editora_nome = loan[7]
-            data_emp = loan[2]
-            quant_emp = loan[1]
+            id_emp, id_liv, quant_emp, data_emp, prazo_emp, livro_nome, autor_nome, ano_nome, editora_nome, status_emp = loan
+
+            if status_emp not in ["Pendente", "Atrasado"]:
+                continue
+
+            loans_found = True
+
             if isinstance(data_emp, str):
                 data_formatada = datetime.strptime(data_emp, "%Y-%m-%d").strftime("%d/%m/%Y")
             else:
@@ -2021,11 +2065,23 @@ class DashboardApp(ctk.CTk):
 
             btn_text = f"Título: {livro_nome} | Autor: {autor_nome} | Ano: {ano_nome} | Editora: {editora_nome} | Quantidade: {quant_emp} | Data: {data_formatada}"
 
-            btn = ctk.CTkButton(scroll_frame, text=btn_text, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, anchor="w",height=40,command=lambda l=loan, p=selection_popup: self.delete_select_and_close(l, p, book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry))
+            btn = ctk.CTkButton(scroll_frame, text=btn_text, fg_color=BLUE_COLOR, hover_color=BLUE_COLOR_HOVER, anchor="w", height=40, command=lambda l=loan, p=selection_popup: self.delete_select_and_close(l, p, book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry))
             btn.pack(pady=5, padx=5, fill="x")
+        
+        if not loans_found:
+             label_vazia = ctk.CTkLabel(scroll_frame, text="Nenhum empréstimo pendente ou atrasado encontrado.", text_color="gray")
+             label_vazia.pack(pady=20)
+
+    def delete_select_and_close(self, loan_data, popup, *args):
+        popup.destroy()
+        self.delete_fill_loan_fields(loan_data, *args)
 
     def delete_fill_loan_fields(self, loan_data, book_entry, autor_entry, ano_entry, editora_entry, quant_entry, date_entry, due_entry):
-        id_liv, quantidade, data, prazo, livro, autor, ano, editora = loan_data
+        id_emp, id_liv, quantidade, data, prazo, livro, autor, ano, editora, status = loan_data
+
+        self.current_loan_id = id_emp
+        self.current_book_id = id_liv
+        self.current_loan_quant = int(quantidade)
 
         if isinstance(data, str):
             data_new = datetime.strptime(data, "%Y-%m-%d").strftime("%d%m%Y")
@@ -2044,10 +2100,6 @@ class DashboardApp(ctk.CTk):
         self.update_disabled_entry(autor_entry, autor)
         self.update_disabled_entry(ano_entry, ano)
         self.update_disabled_entry(editora_entry, editora)
-
-    def delete_select_and_close(self, loan_data, popup, *args):
-        popup.destroy()
-        self.delete_fill_loan_fields(loan_data, *args)
 
     def show_returns(self):
         self.clear_main_frame()
@@ -2147,25 +2199,29 @@ class DashboardApp(ctk.CTk):
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
         def confirm_and_close():
-            popup.destroy()     
-            if func == "books":
-                cursor = Database.sql.cursor()
-                cursor.execute(query, values)
-                Database.sql.commit()
-                self.popup_book.destroy()
-                self.close_screen()
-            if func == "users":
-                cursor = Database.sql.cursor()
-                cursor.execute(query, values)
-                Database.sql.commit()
-                self.popup_user.destroy()
-                self.close_screen()
-            if func == "loans":
-                cursor = Database.sql.cursor()
-                cursor.execute(query, values)
-                Database.sql.commit()
-                self.popup_loan.destroy()
-                self.close_screen()
+            try:
+                popup.destroy()     
+                if func == "books":
+                    cursor = Database.sql.cursor()
+                    cursor.execute(query, values)
+                    Database.sql.commit()
+                    self.popup_book.destroy()
+                    self.close_screen()
+                if func == "users":
+                    cursor = Database.sql.cursor()
+                    cursor.execute(query, values)
+                    Database.sql.commit()
+                    self.popup_user.destroy()
+                    self.close_screen()
+                if func == "loans":
+                    cursor = Database.sql.cursor()
+                    cursor.execute(query, values)
+                    Database.sql.commit()
+                    self.popup_loan.destroy()
+                    self.close_screen()
+            except Exception as e:
+                Database.sql.rollback()
+                messagebox.showerror("Erro", f"Erro ao confirmar: {e}")
             
         confirm_button = ctk.CTkButton(content_frame, text="Sim", command=confirm_and_close, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
         confirm_button.grid(row=2, column=1, padx=10, pady=(0, 25), sticky="w")
@@ -2179,7 +2235,7 @@ class DashboardApp(ctk.CTk):
         y = self.winfo_y() + (self.winfo_height() // 2) - (req_height // 2)
         popup.geometry(f"{req_width}x{req_height}+{x}+{y}")
 
-    def confirm_button_add_loan(self, query_insert, values, query_update_stock):
+    def confirm_button_add_loan(self, query_insert, values, query_update_stock, values_update):
         popup = ctk.CTkToplevel(self, fg_color="white")
         popup.title("Confirmação dos Dados")
         popup.resizable(False, False)
@@ -2208,14 +2264,70 @@ class DashboardApp(ctk.CTk):
         cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
 
         def confirm_and_close():
-            popup.destroy()     
-            cursor = Database.sql.cursor()
-            cursor.execute(query_insert, values)
-            Database.sql.commit()
-            cursor.execute(query_update_stock)
-            Database.sql.commit()
-            self.popup_loan.destroy()
-            self.close_screen()
+            try:
+                popup.destroy()     
+                cursor = Database.sql.cursor()
+                cursor.execute(query_insert, values)
+                cursor.execute(query_update_stock, values_update)
+                Database.sql.commit()
+                self.popup_loan.destroy()
+                self.close_screen()
+            except Exception as e:
+                Database.sql.rollback()
+                messagebox.showerror("Erro", f"Erro ao confirmar: {e}")
+            
+        confirm_button = ctk.CTkButton(content_frame, text="Sim", command=confirm_and_close, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
+        confirm_button.grid(row=2, column=1, padx=10, pady=(0, 25), sticky="w")
+        confirm_button.bind("<Enter>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
+        confirm_button.bind("<Leave>", lambda e: confirm_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=BUTTON_NEUTRAL))
+
+        popup.update_idletasks()
+        req_width = popup.winfo_reqwidth()
+        req_height = popup.winfo_reqheight()
+        x = self.winfo_x() + (self.winfo_width() // 2) - (req_width // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (req_height // 2)
+        popup.geometry(f"{req_width}x{req_height}+{x}+{y}")
+
+    def confirm_button_edit_loan(self, query_action, values, query_stock, values_stock):
+        popup = ctk.CTkToplevel(self, fg_color="white")
+        popup.title("Confirmação dos Dados")
+        popup.resizable(False, False)
+        popup.transient(self)
+        popup.grab_set()
+
+        popup.grid_columnconfigure(0, weight=1)
+        popup.grid_rowconfigure(0, weight=1)
+
+        content_frame = ctk.CTkFrame(popup, fg_color="white", corner_radius=0)
+        content_frame.pack(fill="both", expand=True)
+        content_frame.grid_columnconfigure((0, 1), weight=1)
+
+        popup_icon = ctk.CTkLabel(content_frame, text="📝", text_color=TEXT_COLOR_BLACK, font=("Arial", 60))
+        popup_icon.grid(row=0, column=0, columnspan=2, pady=(15, 5))
+
+        popup_title = ctk.CTkLabel(content_frame, text="Os dados estão corretos?", text_color=TEXT_COLOR_BLACK, font=("Arial", 14, "bold"), justify="center")
+        popup_title.grid(row=1, column=0, columnspan=2, pady=(5, 20), padx=20)
+
+        def confirm_and_try():
+            popup.destroy()
+
+        cancel_button = ctk.CTkButton(content_frame, text="Não", command=confirm_and_try, fg_color=LIGHT_COLOR, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
+        cancel_button.grid(row=2, column=0, padx=10, pady=(0, 25), sticky="e")
+        cancel_button.bind("<Enter>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_WHITE, fg_color=BLUE_COLOR_HOVER))
+        cancel_button.bind("<Leave>", lambda e: cancel_button.configure(text_color=TEXT_COLOR_BLACK, fg_color=LIGHT_COLOR))
+
+        def confirm_and_close():
+            try:
+                popup.destroy()     
+                cursor = Database.sql.cursor()
+                cursor.execute(query_action, values)
+                cursor.execute(query_stock, values_stock)
+                Database.sql.commit()
+                self.popup_loan.destroy()
+                self.close_screen()
+            except Exception as e:
+                Database.sql.rollback()
+                messagebox.showerror("Erro", f"Erro ao confirmar: {e}")
             
         confirm_button = ctk.CTkButton(content_frame, text="Sim", command=confirm_and_close, fg_color=BUTTON_NEUTRAL, text_color=TEXT_COLOR_BLACK, corner_radius=25, width=50)
         confirm_button.grid(row=2, column=1, padx=10, pady=(0, 25), sticky="w")
